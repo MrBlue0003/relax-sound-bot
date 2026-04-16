@@ -1,0 +1,65 @@
+name: Relax Sound Daily Post
+
+on:
+  schedule:
+    # 3x/day: 08:00, 14:00, 20:00 UTC = 11:00, 17:00, 23:00 Bucharest (EEST)
+    - cron: '0 8,14,20 * * *'
+  workflow_dispatch:   # allow manual trigger from GitHub UI
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 1
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-liberation
+          ffmpeg -version | head -1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create required directories
+        run: mkdir -p logs assets output
+
+      - name: Run bot
+        env:
+          PIXABAY_API_KEY:       ${{ secrets.PIXABAY_API_KEY }}
+          YOUTUBE_CLIENT_ID:     ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YOUTUBE_CHANNEL_ID:    ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          UPLOAD_TIMEZONE:       Europe/Bucharest
+          VIDEO_DURATION:        90
+        run: python main.py
+
+      - name: Save upload log to repo
+        if: success()
+        run: |
+          git config user.email "relaxsound-bot@github.com"
+          git config user.name "Relax Sound Bot"
+          git add logs/uploaded.json
+          git diff --staged --quiet || git commit -m "chore: update upload log [skip ci]"
+          git push
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-logs-${{ github.run_id }}
+          path: logs/
+          retention-days: 7
