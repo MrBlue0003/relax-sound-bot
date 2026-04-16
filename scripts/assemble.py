@@ -60,22 +60,21 @@ def _run_ffmpeg(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
 
 
 def build_video(theme: dict, media_path: Path, output_path: Path,
-                duration: int = 90) -> Path:
+                duration: int = 90, audio_path: Path | None = None) -> Path:
     """
     Build a relaxation video.
-    - If media_path is .mp4: loop the video, keep its original audio, add text overlay.
-    - If media_path is .jpg/.png: use image as background + ffmpeg anoisesrc audio.
+    - media_path .mp4 + audio_path: loop video visuals, use audio_path as sound
+    - media_path .mp4 (no audio_path): loop video with original audio (or noise if mute)
+    - media_path .jpg/.png + audio_path: image bg + audio_path
+    - media_path .jpg/.png (no audio_path): image bg + anoisesrc generated noise
     """
     font = FONT_PATH
     name_text = esc(theme["name"].upper())
     subtitle_text = esc(theme["subtitle"].upper())
 
-    # Top bar: name of the sound
     top_box_y = 60
     top_box_h = 200
     name_y = top_box_y + 30
-
-    # Bottom bar: subtitle
     bot_box_y = HEIGHT - 155
     bot_box_h = 130
     sub_y = bot_box_y + 32
@@ -97,26 +96,31 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     media_str = str(media_path.resolve()).replace("\\", "/")
     out_str = str(output_path.resolve()).replace("\\", "/")
 
+    # Determine audio source: themed synthetic noise via ffmpeg lavfi
+    audio_filter = theme.get("audio_filter", "anoisesrc=color=brown")
+    # Volume boost since anoisesrc is quiet
+    audio_lavfi = f"{audio_filter},volume=4.0"
+
     if is_video:
-        # Loop the Pixabay video (5-30s) to fill the full duration
-        # -stream_loop -1 loops forever, -t cuts at duration seconds
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-stream_loop", "-1", "-i", media_str,
+            "-f", "lavfi", "-i", audio_lavfi,
             "-t", str(duration),
-            "-vf", vf,
+            "-filter_complex",
+            f"[0:v]{vf}[vout]",
+            "-map", "[vout]", "-map", "1:a",
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
             "-c:a", "aac", "-b:a", "128k",
             "-movflags", "+faststart",
             out_str,
         ]
     else:
-        # Image + generated noise audio
-        noise_color = theme.get("noise_color", "white")
+        # Image + themed noise
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-loop", "1", "-i", media_str,
-            "-f", "lavfi", "-i", f"anoisesrc=color={noise_color}",
+            "-f", "lavfi", "-i", audio_lavfi,
             "-t", str(duration),
             "-filter_complex", f"[0:v]{vf}[vout]",
             "-map", "[vout]", "-map", "1:a",
@@ -127,7 +131,7 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
             out_str,
         ]
 
-    logger.info(f"Building video: {theme['name']} ({duration}s, {'video' if is_video else 'image+noise'})")
+    logger.info(f"Building video: {theme['name']} ({duration}s)")
     result = _run_ffmpeg(ffmpeg_args, output_path.parent)
 
     if result.returncode != 0:

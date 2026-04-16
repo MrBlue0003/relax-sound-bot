@@ -7,6 +7,7 @@
       "subtitle": "for Sleep & Relaxation",
       "video_queries": ["heavy rain", "rain storm", "rain window"],
       "image_queries": ["rain window dark", "rainy night city", "rain drops"],
+      "audio_filter": "anoisesrc=color=brown,highpass=f=300,lowpass=f=5000,acompressor=threshold=0.1:ratio=3",
       "tags": ["rain", "sleep", "ASMR", "white noise", "relaxing"]
     },
     {
@@ -16,6 +17,7 @@
       "subtitle": "for Deep Sleep",
       "video_queries": ["ocean waves beach", "sea waves", "waves crashing shore"],
       "image_queries": ["ocean waves beach sunset", "sea waves calm", "beach waves"],
+      "audio_filter": "anoisesrc=color=brown,lowpass=f=500,acompressor=threshold=0.15:ratio=4:attack=200:release=1000",
       "tags": ["ocean", "waves", "sleep", "nature", "relaxing"]
     },
     {
@@ -25,6 +27,7 @@
       "subtitle": "for Cozy Relaxation",
       "video_queries": ["fireplace crackling fire", "cozy fireplace", "fire burning logs"],
       "image_queries": ["cozy fireplace dark", "burning fire logs", "fireplace warm"],
+      "audio_filter": "anoisesrc=color=pink,lowpass=f=2000,highpass=f=80",
       "tags": ["fireplace", "cozy", "relax", "ASMR", "fire"]
     },
     {
@@ -34,6 +37,7 @@
       "subtitle": "for Deep Sleep",
       "video_queries": ["thunderstorm rain", "storm lightning rain", "heavy thunderstorm"],
       "image_queries": ["thunderstorm dark clouds", "storm lightning sky", "rain storm"],
+      "audio_filter": "anoisesrc=color=brown,highpass=f=200,lowpass=f=6000",
       "tags": ["storm", "thunder", "rain", "sleep", "ASMR"]
     },
     {
@@ -43,6 +47,7 @@
       "subtitle": "for Stress Relief",
       "video_queries": ["waterfall nature", "waterfall forest", "cascade waterfall"],
       "image_queries": ["waterfall nature forest", "waterfall peaceful", "cascade water"],
+      "audio_filter": "anoisesrc=color=white,highpass=f=500,lowpass=f=8000,acompressor=threshold=0.2:ratio=2",
       "tags": ["waterfall", "nature", "stress relief", "relax", "calm"]
     },
     {
@@ -52,6 +57,7 @@
       "subtitle": "for Morning Energy",
       "video_queries": ["forest birds nature", "birds singing forest", "bird sounds trees"],
       "image_queries": ["forest morning light", "trees birds nature", "green forest calm"],
+      "audio_filter": "anoisesrc=color=pink,highpass=f=800,lowpass=f=6000",
       "tags": ["birds", "nature", "morning", "calm", "forest"]
     },
     {
@@ -61,6 +67,7 @@
       "subtitle": "for Study & Focus",
       "video_queries": ["gentle rain", "light rain", "soft rain nature"],
       "image_queries": ["light rain drops", "gentle rain window", "soft rain leaves"],
+      "audio_filter": "anoisesrc=color=brown,highpass=f=400,lowpass=f=4000",
       "tags": ["rain", "study", "focus", "calm", "relaxing"]
     },
     {
@@ -70,6 +77,7 @@
       "subtitle": "for Calm & Focus",
       "video_queries": ["river stream nature", "mountain river", "flowing water stream"],
       "image_queries": ["river stream forest", "mountain stream calm", "flowing river"],
+      "audio_filter": "anoisesrc=color=white,highpass=f=600,lowpass=f=7000",
       "tags": ["river", "water", "focus", "nature", "calm"]
     },
     {
@@ -79,6 +87,7 @@
       "subtitle": "for Sleep & Meditation",
       "video_queries": ["night crickets", "cricket sounds night", "summer night insects"],
       "image_queries": ["night sky stars peaceful", "night field moonlight", "dark night calm"],
+      "audio_filter": "anoisesrc=color=pink,highpass=f=1500,lowpass=f=5000",
       "tags": ["night", "crickets", "sleep", "nature", "meditation"]
     },
     {
@@ -88,6 +97,7 @@
       "subtitle": "for Cozy Reading",
       "video_queries": ["rain on window", "rain glass window", "rainy day indoors"],
       "image_queries": ["rain on window cozy", "rain glass drops", "rainy window inside"],
+      "audio_filter": "anoisesrc=color=brown,highpass=f=350,lowpass=f=4500",
       "tags": ["rain", "cozy", "relax", "ASMR", "window"]
     },
     {
@@ -98,6 +108,7 @@
       "video_queries": ["electric fan noise", "fan spinning white noise", "fan sound"],
       "noise_color": "white",
       "image_queries": ["white fog minimalist", "white abstract texture", "white gradient calm"],
+      "audio_filter": "anoisesrc=color=white",
       "tags": ["white noise", "sleep", "focus", "ASMR", "baby sleep"]
     },
     {
@@ -107,6 +118,7 @@
       "subtitle": "for Deep Relaxation",
       "video_queries": ["wind trees leaves", "wind forest", "autumn wind leaves"],
       "image_queries": ["wind trees leaves autumn", "forest wind calm", "trees swaying wind"],
+      "audio_filter": "anoisesrc=color=brown,highpass=f=150,lowpass=f=3000",
       "tags": ["wind", "nature", "relax", "calm", "forest"]
     },
     {
@@ -116,6 +128,7 @@
       "subtitle": "for a Fresh Start",
       "video_queries": ["birds chirping morning", "dawn chorus birds", "morning birds nature"],
       "image_queries": ["morning sunrise nature", "dawn birds trees", "morning mist forest"],
+      "audio_filter": "anoisesrc=color=pink,highpass=f=1000,lowpass=f=7000",
       "tags": ["birds", "morning", "nature", "energy", "calm"]
     },
     {
@@ -125,6 +138,7 @@
       "subtitle": "for Deep Sleep",
       "video_queries": ["tropical rain forest", "jungle rain", "rainforest tropical"],
       "image_queries": ["tropical rainforest rain", "jungle green rain", "tropical forest"],
+      "audio_filter": "anoisesrc=color=brown,highpass=f=250,lowpass=f=6000",
       "tags": ["rain", "tropical", "sleep", "nature", "jungle"]
     },
     {
@@ -134,6 +148,7 @@
       "subtitle": "for Study & Work",
       "video_queries": ["coffee shop ambient", "cafe background", "coffee shop people"],
       "image_queries": ["coffee shop cozy", "cafe warm light", "coffee shop table"],
+      "audio_filter": "anoisesrc=color=pink,highpass=f=200,lowpass=f=4000",
       "tags": ["cafe", "study", "work", "focus", "ambient"]
     },
     {
@@ -144,6 +159,7 @@
       "video_queries": ["brown noise low frequency", "deep drone noise", "bass rumble sound"],
       "noise_color": "brown",
       "image_queries": ["dark forest trees brown", "brown earth tones minimal", "dark minimal calm"],
+      "audio_filter": "anoisesrc=color=brown",
       "tags": ["brown noise", "focus", "ADHD", "deep work", "concentration"]
     },
     {
@@ -153,6 +169,7 @@
       "subtitle": "for Peace & Calm",
       "video_queries": ["snowfall silent forest", "snow falling winter", "winter snow scene"],
       "image_queries": ["snowfall winter forest", "snow falling peaceful", "winter white snow"],
+      "audio_filter": "anoisesrc=color=brown,highpass=f=100,lowpass=f=1500",
       "tags": ["snow", "winter", "calm", "peaceful", "relaxing"]
     },
     {
@@ -163,6 +180,7 @@
       "video_queries": ["soft static noise", "white noise machine sleep", "noise fan sleep"],
       "noise_color": "pink",
       "image_queries": ["pink gradient soft", "pink pastel abstract", "pink sky sunrise calm"],
+      "audio_filter": "anoisesrc=color=pink",
       "tags": ["pink noise", "sleep", "relaxation", "calm", "baby sleep"]
     },
     {
@@ -172,6 +190,7 @@
       "subtitle": "for Meditation",
       "video_queries": ["underwater ocean calm", "underwater bubbles peaceful", "deep underwater blue"],
       "image_queries": ["underwater ocean blue", "underwater calm peaceful", "deep sea blue"],
+      "audio_filter": "anoisesrc=color=brown,lowpass=f=300,acompressor=threshold=0.1:ratio=5:attack=500:release=2000",
       "tags": ["underwater", "meditation", "calm", "ocean", "relax"]
     },
     {
@@ -182,6 +201,7 @@
       "video_queries": ["ceiling fan spinning", "electric fan bedroom", "fan rotating slow"],
       "noise_color": "white",
       "image_queries": ["fan minimal dark room", "dark minimal bedroom", "dark gradient calm"],
+      "audio_filter": "anoisesrc=color=white,lowpass=f=2500",
       "tags": ["fan", "white noise", "sleep", "ASMR", "noise machine"]
     },
     {
@@ -192,6 +212,7 @@
       "video_queries": ["vacuum cleaner sound", "hoover vacuum cleaning", "vacuum white noise"],
       "noise_color": "white",
       "image_queries": ["clean white floor minimal", "white minimal clean space", "white room clean light"],
+      "audio_filter": "anoisesrc=color=white,highpass=f=200,lowpass=f=3500",
       "tags": ["vacuum", "white noise", "baby sleep", "ASMR", "focus"]
     }
   ]
