@@ -1,0 +1,9 @@
+.env
+client_secrets.json
+assets/
+output/
+logs/*.log
+__pycache__/
+*.pyc
+*.tmp
+!logs/uploaded.json

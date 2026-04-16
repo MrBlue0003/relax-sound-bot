@@ -1,0 +1,198 @@
+{
+  "sounds": [
+    {
+      "id": 1,
+      "name": "Heavy Rain",
+      "emoji": "\ud83c\udf27\ufe0f",
+      "subtitle": "for Sleep & Relaxation",
+      "video_queries": ["heavy rain", "rain storm", "rain window"],
+      "image_queries": ["rain window dark", "rainy night city", "rain drops"],
+      "tags": ["rain", "sleep", "ASMR", "white noise", "relaxing"]
+    },
+    {
+      "id": 2,
+      "name": "Ocean Waves",
+      "emoji": "\ud83c\udf0a",
+      "subtitle": "for Deep Sleep",
+      "video_queries": ["ocean waves beach", "sea waves", "waves crashing shore"],
+      "image_queries": ["ocean waves beach sunset", "sea waves calm", "beach waves"],
+      "tags": ["ocean", "waves", "sleep", "nature", "relaxing"]
+    },
+    {
+      "id": 3,
+      "name": "Crackling Fireplace",
+      "emoji": "\ud83d\udd25",
+      "subtitle": "for Cozy Relaxation",
+      "video_queries": ["fireplace crackling fire", "cozy fireplace", "fire burning logs"],
+      "image_queries": ["cozy fireplace dark", "burning fire logs", "fireplace warm"],
+      "tags": ["fireplace", "cozy", "relax", "ASMR", "fire"]
+    },
+    {
+      "id": 4,
+      "name": "Thunderstorm",
+      "emoji": "\u26c8\ufe0f",
+      "subtitle": "for Deep Sleep",
+      "video_queries": ["thunderstorm rain", "storm lightning rain", "heavy thunderstorm"],
+      "image_queries": ["thunderstorm dark clouds", "storm lightning sky", "rain storm"],
+      "tags": ["storm", "thunder", "rain", "sleep", "ASMR"]
+    },
+    {
+      "id": 5,
+      "name": "Waterfall",
+      "emoji": "\ud83c\udf3f",
+      "subtitle": "for Stress Relief",
+      "video_queries": ["waterfall nature", "waterfall forest", "cascade waterfall"],
+      "image_queries": ["waterfall nature forest", "waterfall peaceful", "cascade water"],
+      "tags": ["waterfall", "nature", "stress relief", "relax", "calm"]
+    },
+    {
+      "id": 6,
+      "name": "Forest Birds",
+      "emoji": "\ud83c\udf33",
+      "subtitle": "for Morning Energy",
+      "video_queries": ["forest birds nature", "birds singing forest", "bird sounds trees"],
+      "image_queries": ["forest morning light", "trees birds nature", "green forest calm"],
+      "tags": ["birds", "nature", "morning", "calm", "forest"]
+    },
+    {
+      "id": 7,
+      "name": "Gentle Rain",
+      "emoji": "\ud83c\udf26\ufe0f",
+      "subtitle": "for Study & Focus",
+      "video_queries": ["gentle rain", "light rain", "soft rain nature"],
+      "image_queries": ["light rain drops", "gentle rain window", "soft rain leaves"],
+      "tags": ["rain", "study", "focus", "calm", "relaxing"]
+    },
+    {
+      "id": 8,
+      "name": "River Stream",
+      "emoji": "\ud83c\udfd5\ufe0f",
+      "subtitle": "for Calm & Focus",
+      "video_queries": ["river stream nature", "mountain river", "flowing water stream"],
+      "image_queries": ["river stream forest", "mountain stream calm", "flowing river"],
+      "tags": ["river", "water", "focus", "nature", "calm"]
+    },
+    {
+      "id": 9,
+      "name": "Night Crickets",
+      "emoji": "\ud83c\udf19",
+      "subtitle": "for Sleep & Meditation",
+      "video_queries": ["night crickets", "cricket sounds night", "summer night insects"],
+      "image_queries": ["night sky stars peaceful", "night field moonlight", "dark night calm"],
+      "tags": ["night", "crickets", "sleep", "nature", "meditation"]
+    },
+    {
+      "id": 10,
+      "name": "Rain on Window",
+      "emoji": "\ud83e\ude9f",
+      "subtitle": "for Cozy Reading",
+      "video_queries": ["rain on window", "rain glass window", "rainy day indoors"],
+      "image_queries": ["rain on window cozy", "rain glass drops", "rainy window inside"],
+      "tags": ["rain", "cozy", "relax", "ASMR", "window"]
+    },
+    {
+      "id": 11,
+      "name": "White Noise",
+      "emoji": "\u2b1c",
+      "subtitle": "for Sleep & Focus",
+      "video_queries": ["electric fan noise", "fan spinning white noise", "fan sound"],
+      "noise_color": "white",
+      "image_queries": ["white fog minimalist", "white abstract texture", "white gradient calm"],
+      "tags": ["white noise", "sleep", "focus", "ASMR", "baby sleep"]
+    },
+    {
+      "id": 12,
+      "name": "Wind in Trees",
+      "emoji": "\ud83c\udf2c\ufe0f",
+      "subtitle": "for Deep Relaxation",
+      "video_queries": ["wind trees leaves", "wind forest", "autumn wind leaves"],
+      "image_queries": ["wind trees leaves autumn", "forest wind calm", "trees swaying wind"],
+      "tags": ["wind", "nature", "relax", "calm", "forest"]
+    },
+    {
+      "id": 13,
+      "name": "Morning Birds",
+      "emoji": "\ud83d\udc26",
+      "subtitle": "for a Fresh Start",
+      "video_queries": ["birds chirping morning", "dawn chorus birds", "morning birds nature"],
+      "image_queries": ["morning sunrise nature", "dawn birds trees", "morning mist forest"],
+      "tags": ["birds", "morning", "nature", "energy", "calm"]
+    },
+    {
+      "id": 14,
+      "name": "Tropical Rain",
+      "emoji": "\ud83c\udf34",
+      "subtitle": "for Deep Sleep",
+      "video_queries": ["tropical rain forest", "jungle rain", "rainforest tropical"],
+      "image_queries": ["tropical rainforest rain", "jungle green rain", "tropical forest"],
+      "tags": ["rain", "tropical", "sleep", "nature", "jungle"]
+    },
+    {
+      "id": 15,
+      "name": "Cafe Ambiance",
+      "emoji": "\u2615",
+      "subtitle": "for Study & Work",
+      "video_queries": ["coffee shop ambient", "cafe background", "coffee shop people"],
+      "image_queries": ["coffee shop cozy", "cafe warm light", "coffee shop table"],
+      "tags": ["cafe", "study", "work", "focus", "ambient"]
+    },
+    {
+      "id": 16,
+      "name": "Brown Noise",
+      "emoji": "\ud83d\udfe7",
+      "subtitle": "for Deep Focus",
+      "video_queries": ["brown noise low frequency", "deep drone noise", "bass rumble sound"],
+      "noise_color": "brown",
+      "image_queries": ["dark forest trees brown", "brown earth tones minimal", "dark minimal calm"],
+      "tags": ["brown noise", "focus", "ADHD", "deep work", "concentration"]
+    },
+    {
+      "id": 17,
+      "name": "Snowfall",
+      "emoji": "\u2744\ufe0f",
+      "subtitle": "for Peace & Calm",
+      "video_queries": ["snowfall silent forest", "snow falling winter", "winter snow scene"],
+      "image_queries": ["snowfall winter forest", "snow falling peaceful", "winter white snow"],
+      "tags": ["snow", "winter", "calm", "peaceful", "relaxing"]
+    },
+    {
+      "id": 18,
+      "name": "Pink Noise",
+      "emoji": "\ud83e\udda9",
+      "subtitle": "for Deep Sleep",
+      "video_queries": ["soft static noise", "white noise machine sleep", "noise fan sleep"],
+      "noise_color": "pink",
+      "image_queries": ["pink gradient soft", "pink pastel abstract", "pink sky sunrise calm"],
+      "tags": ["pink noise", "sleep", "relaxation", "calm", "baby sleep"]
+    },
+    {
+      "id": 19,
+      "name": "Underwater",
+      "emoji": "\ud83d\udc20",
+      "subtitle": "for Meditation",
+      "video_queries": ["underwater ocean calm", "underwater bubbles peaceful", "deep underwater blue"],
+      "image_queries": ["underwater ocean blue", "underwater calm peaceful", "deep sea blue"],
+      "tags": ["underwater", "meditation", "calm", "ocean", "relax"]
+    },
+    {
+      "id": 20,
+      "name": "Fan Sound",
+      "emoji": "\ud83d\udca8",
+      "subtitle": "for Sleep & White Noise",
+      "video_queries": ["ceiling fan spinning", "electric fan bedroom", "fan rotating slow"],
+      "noise_color": "white",
+      "image_queries": ["fan minimal dark room", "dark minimal bedroom", "dark gradient calm"],
+      "tags": ["fan", "white noise", "sleep", "ASMR", "noise machine"]
+    },
+    {
+      "id": 21,
+      "name": "Vacuum Cleaner",
+      "emoji": "\ud83c\udf00",
+      "subtitle": "for Baby Sleep & Focus",
+      "video_queries": ["vacuum cleaner sound", "hoover vacuum cleaning", "vacuum white noise"],
+      "noise_color": "white",
+      "image_queries": ["clean white floor minimal", "white minimal clean space", "white room clean light"],
+      "tags": ["vacuum", "white noise", "baby sleep", "ASMR", "focus"]
+    }
+  ]
+}
