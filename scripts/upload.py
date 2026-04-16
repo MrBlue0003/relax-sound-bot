@@ -68,14 +68,14 @@ def _verify_channel(youtube) -> tuple[str, str]:
     return channel_id, channel_name
 
 
-def upload_video(video_path: Path, theme: dict) -> str:
+def upload_video(video_path: Path, variant: dict) -> str:
     """Upload video to YouTube. Returns video_id."""
     if not video_path.exists():
         raise FileNotFoundError(f"Video not found: {video_path}")
 
-    name = theme["name"]
-    subtitle = theme["subtitle"]
-    tags_base = theme.get("tags", [])
+    name = variant["name"]
+    subtitle = variant["subtitle"]
+    tags_base = variant.get("tags", [])
     tags = list(set(tags_base + [
         "relaxing sounds", "sleep sounds", "ASMR", "shorts",
         "relax", "meditation", "ambient sounds", "nature sounds",
@@ -138,7 +138,7 @@ def upload_video(video_path: Path, theme: dict) -> str:
 
             video_id = response["id"]
             logger.info(f"Upload complete! https://www.youtube.com/watch?v={video_id}")
-            _record_upload(video_id, title, theme["id"])
+            _record_upload(video_id, title, variant)
             return video_id
 
         except HttpError as e:
@@ -150,7 +150,7 @@ def upload_video(video_path: Path, theme: dict) -> str:
                 raise
 
 
-def _record_upload(video_id: str, title: str, theme_id: int) -> None:
+def _record_upload(video_id: str, title: str, variant: dict) -> None:
     f = config.UPLOADED_FILE
     data: dict = {"uploads": []}
     if f.exists():
@@ -160,7 +160,8 @@ def _record_upload(video_id: str, title: str, theme_id: int) -> None:
     data["uploads"].append({
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "video_id": video_id,
-        "theme_id": theme_id,
+        "category_id": variant.get("category_id", ""),
+        "variant_id": variant.get("id", ""),
         "title": title,
         "url": f"https://www.youtube.com/watch?v={video_id}",
     })

@@ -1,219 +1,382 @@
 {
-  "sounds": [
+  "categories": [
     {
-      "id": 1,
-      "name": "Heavy Rain",
-      "emoji": "\ud83c\udf27\ufe0f",
-      "subtitle": "for Sleep & Relaxation",
-      "video_queries": ["heavy rain", "rain storm", "rain window"],
-      "image_queries": ["rain window dark", "rainy night city", "rain drops"],
-      "audio_filter": "anoisesrc=color=brown,highpass=f=300,lowpass=f=5000,acompressor=threshold=0.1:ratio=3",
-      "tags": ["rain", "sleep", "ASMR", "white noise", "relaxing"]
+      "id": "rain",
+      "label": "Rain Sounds",
+      "variants": [
+        {
+          "id": "heavy_rain",
+          "name": "Heavy Rain",
+          "subtitle": "for Deep Sleep",
+          "video_queries": ["heavy rain", "rain storm", "rain drops"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=300,lowpass=f=5000,volume=5.0",
+          "tags": ["rain", "sleep", "ASMR", "white noise", "relaxing"]
+        },
+        {
+          "id": "thunderstorm",
+          "name": "Thunderstorm Rain",
+          "subtitle": "for Deep Sleep",
+          "video_queries": ["thunderstorm rain", "storm lightning rain", "thunder rain"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=200,lowpass=f=6000,volume=6.0",
+          "tags": ["storm", "thunder", "rain", "sleep", "ASMR"]
+        },
+        {
+          "id": "gentle_rain",
+          "name": "Gentle Rain",
+          "subtitle": "for Study & Focus",
+          "video_queries": ["gentle rain", "light rain", "soft rain nature"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=400,lowpass=f=4000,volume=4.0",
+          "tags": ["rain", "study", "focus", "calm", "relaxing"]
+        },
+        {
+          "id": "rain_window",
+          "name": "Rain on Window",
+          "subtitle": "for Cozy Reading",
+          "video_queries": ["rain on window", "rain glass window", "rainy day indoors"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=350,lowpass=f=4500,volume=4.5",
+          "tags": ["rain", "cozy", "relax", "ASMR", "window"]
+        },
+        {
+          "id": "tropical_rain",
+          "name": "Tropical Rain",
+          "subtitle": "for Relaxation",
+          "video_queries": ["tropical rain forest", "jungle rain", "rainforest rain"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=250,lowpass=f=6000,volume=5.5",
+          "tags": ["rain", "tropical", "sleep", "nature", "jungle"]
+        },
+        {
+          "id": "summer_rain",
+          "name": "Summer Rain",
+          "subtitle": "for Sleep & Calm",
+          "video_queries": ["summer rain", "warm rain", "rain garden nature"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=320,lowpass=f=4800,volume=4.8",
+          "tags": ["rain", "sleep", "calm", "nature", "relaxing"]
+        }
+      ]
     },
     {
-      "id": 2,
-      "name": "Ocean Waves",
-      "emoji": "\ud83c\udf0a",
-      "subtitle": "for Deep Sleep",
-      "video_queries": ["ocean waves beach", "sea waves", "waves crashing shore"],
-      "image_queries": ["ocean waves beach sunset", "sea waves calm", "beach waves"],
-      "audio_filter": "anoisesrc=color=brown,lowpass=f=500,acompressor=threshold=0.15:ratio=4:attack=200:release=1000",
-      "tags": ["ocean", "waves", "sleep", "nature", "relaxing"]
+      "id": "meditation",
+      "label": "Meditation & Relaxing Music",
+      "variants": [
+        {
+          "id": "432hz",
+          "name": "432Hz Healing Tone",
+          "subtitle": "432Hz Healing Frequency",
+          "video_queries": ["meditation calm nature", "peaceful zen garden", "spiritual meditation"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*432*t)*0.35+sin(2*PI*864*t)*0.15+sin(2*PI*216*t)*0.1:s=44100:c=stereo,volume=2.0",
+          "tags": ["meditation", "432hz", "healing", "calm", "sleep"]
+        },
+        {
+          "id": "tibetan_bowls",
+          "name": "Tibetan Singing Bowls",
+          "subtitle": "for Deep Meditation",
+          "video_queries": ["tibetan meditation", "singing bowl meditation", "zen meditation"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*396*t)*0.3+sin(2*PI*528*t)*0.2+sin(2*PI*264*t)*0.15:s=44100:c=stereo,volume=2.0",
+          "tags": ["tibetan", "singing bowl", "meditation", "relax", "healing"]
+        },
+        {
+          "id": "528hz",
+          "name": "528Hz Love Frequency",
+          "subtitle": "528Hz Love Frequency",
+          "video_queries": ["peaceful meditation nature", "calm water meditation", "zen atmosphere"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*528*t)*0.3+sin(2*PI*1056*t)*0.1+sin(2*PI*264*t)*0.15:s=44100:c=stereo,volume=2.0",
+          "tags": ["528hz", "love frequency", "meditation", "healing", "calm"]
+        },
+        {
+          "id": "174hz_drone",
+          "name": "Deep Meditation Drone",
+          "subtitle": "174Hz Pain Relief",
+          "video_queries": ["deep meditation forest", "calm lake peaceful", "meditation sunrise"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*174*t)*0.4+sin(2*PI*348*t)*0.2+sin(2*PI*87*t)*0.1:s=44100:c=stereo,volume=2.5",
+          "tags": ["174hz", "pain relief", "meditation", "deep", "healing"]
+        },
+        {
+          "id": "theta_waves",
+          "name": "Theta Waves",
+          "subtitle": "Theta Waves for Focus",
+          "video_queries": ["theta brain waves", "deep focus meditation", "peaceful mind calm"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*200*t)*0.3+sin(2*PI*206*t)*0.3:s=44100:c=stereo,volume=2.0",
+          "tags": ["theta waves", "focus", "meditation", "brain waves", "sleep"]
+        },
+        {
+          "id": "639hz",
+          "name": "639Hz Heart Chakra",
+          "subtitle": "639Hz Heart Chakra",
+          "video_queries": ["heart chakra meditation", "harmony peaceful nature", "calm sunrise water"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*639*t)*0.25+sin(2*PI*319*t)*0.2+sin(2*PI*1278*t)*0.1:s=44100:c=stereo,volume=2.0",
+          "tags": ["639hz", "heart chakra", "meditation", "harmony", "healing"]
+        }
+      ]
     },
     {
-      "id": 3,
-      "name": "Crackling Fireplace",
-      "emoji": "\ud83d\udd25",
-      "subtitle": "for Cozy Relaxation",
-      "video_queries": ["fireplace crackling fire", "cozy fireplace", "fire burning logs"],
-      "image_queries": ["cozy fireplace dark", "burning fire logs", "fireplace warm"],
-      "audio_filter": "anoisesrc=color=pink,lowpass=f=2000,highpass=f=80",
-      "tags": ["fireplace", "cozy", "relax", "ASMR", "fire"]
+      "id": "white_noise",
+      "label": "White Noise",
+      "variants": [
+        {
+          "id": "pure_white",
+          "name": "Pure White Noise",
+          "subtitle": "for Sleep & Focus",
+          "video_queries": ["electric fan spinning", "fan noise", "fan bedroom"],
+          "audio_lavfi": "anoisesrc=color=white,volume=3.5",
+          "tags": ["white noise", "sleep", "focus", "ASMR", "baby sleep"]
+        },
+        {
+          "id": "vacuum",
+          "name": "Vacuum Cleaner",
+          "subtitle": "for Baby Sleep",
+          "video_queries": ["vacuum cleaner", "hoover vacuum cleaning", "vacuum white noise"],
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=200,lowpass=f=3500,volume=4.0",
+          "tags": ["vacuum", "white noise", "baby sleep", "ASMR", "focus"]
+        },
+        {
+          "id": "air_conditioner",
+          "name": "Air Conditioner",
+          "subtitle": "for Sleep & Concentration",
+          "video_queries": ["air conditioner unit", "AC fan", "hvac cooling"],
+          "audio_lavfi": "anoisesrc=color=white,lowpass=f=2000,volume=3.5",
+          "tags": ["AC", "white noise", "sleep", "focus", "concentration"]
+        },
+        {
+          "id": "fan_noise",
+          "name": "Fan Noise",
+          "subtitle": "for Sleep",
+          "video_queries": ["ceiling fan spinning", "bedroom desk fan", "fan rotating slow"],
+          "audio_lavfi": "anoisesrc=color=white,lowpass=f=2500,highpass=f=100,volume=3.8",
+          "tags": ["fan", "white noise", "sleep", "ASMR", "noise machine"]
+        },
+        {
+          "id": "pink_noise",
+          "name": "Pink Noise",
+          "subtitle": "for Deep Sleep",
+          "video_queries": ["pink sky sunrise", "soft pink clouds", "pastel sky gradient"],
+          "audio_lavfi": "anoisesrc=color=pink,volume=3.5",
+          "tags": ["pink noise", "sleep", "relaxation", "calm", "baby sleep"]
+        },
+        {
+          "id": "box_fan",
+          "name": "Box Fan Sound",
+          "subtitle": "for Deep Sleep",
+          "video_queries": ["industrial fan", "mechanical fan", "large fan rotating"],
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=150,lowpass=f=3000,volume=3.5",
+          "tags": ["fan", "white noise", "sleep", "ADHD", "focus"]
+        }
+      ]
     },
     {
-      "id": 4,
-      "name": "Thunderstorm",
-      "emoji": "\u26c8\ufe0f",
-      "subtitle": "for Deep Sleep",
-      "video_queries": ["thunderstorm rain", "storm lightning rain", "heavy thunderstorm"],
-      "image_queries": ["thunderstorm dark clouds", "storm lightning sky", "rain storm"],
-      "audio_filter": "anoisesrc=color=brown,highpass=f=200,lowpass=f=6000",
-      "tags": ["storm", "thunder", "rain", "sleep", "ASMR"]
+      "id": "ocean",
+      "label": "Ocean & Water Sounds",
+      "variants": [
+        {
+          "id": "ocean_waves",
+          "name": "Ocean Waves",
+          "subtitle": "for Deep Sleep",
+          "video_queries": ["ocean waves beach", "sea waves", "waves crashing shore"],
+          "audio_lavfi": "anoisesrc=color=brown,lowpass=f=500,volume=5.5",
+          "tags": ["ocean", "waves", "sleep", "nature", "relaxing"]
+        },
+        {
+          "id": "waterfall",
+          "name": "Waterfall",
+          "subtitle": "for Stress Relief",
+          "video_queries": ["waterfall nature", "waterfall forest", "cascade waterfall"],
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=500,lowpass=f=8000,volume=5.0",
+          "tags": ["waterfall", "nature", "stress relief", "relax", "calm"]
+        },
+        {
+          "id": "river_stream",
+          "name": "River Stream",
+          "subtitle": "for Calm & Focus",
+          "video_queries": ["river stream nature", "mountain river", "flowing water stream"],
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=600,lowpass=f=7000,volume=4.5",
+          "tags": ["river", "water", "focus", "nature", "calm"]
+        },
+        {
+          "id": "beach_waves",
+          "name": "Beach Waves",
+          "subtitle": "for Relaxation",
+          "video_queries": ["beach waves sunset", "calm beach ocean", "beach waves sand"],
+          "audio_lavfi": "anoisesrc=color=brown,lowpass=f=600,volume=5.0",
+          "tags": ["beach", "waves", "ocean", "relax", "sleep"]
+        },
+        {
+          "id": "underwater",
+          "name": "Underwater Ambiance",
+          "subtitle": "for Meditation",
+          "video_queries": ["underwater ocean calm", "underwater bubbles peaceful", "deep underwater blue"],
+          "audio_lavfi": "anoisesrc=color=brown,lowpass=f=300,volume=4.0",
+          "tags": ["underwater", "meditation", "calm", "ocean", "relax"]
+        },
+        {
+          "id": "gentle_creek",
+          "name": "Gentle Creek",
+          "subtitle": "for Focus & Calm",
+          "video_queries": ["creek stream water", "small river nature", "babbling brook forest"],
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=700,lowpass=f=6000,volume=4.5",
+          "tags": ["creek", "water", "focus", "nature", "calm"]
+        }
+      ]
     },
     {
-      "id": 5,
-      "name": "Waterfall",
-      "emoji": "\ud83c\udf3f",
-      "subtitle": "for Stress Relief",
-      "video_queries": ["waterfall nature", "waterfall forest", "cascade waterfall"],
-      "image_queries": ["waterfall nature forest", "waterfall peaceful", "cascade water"],
-      "audio_filter": "anoisesrc=color=white,highpass=f=500,lowpass=f=8000,acompressor=threshold=0.2:ratio=2",
-      "tags": ["waterfall", "nature", "stress relief", "relax", "calm"]
+      "id": "forest",
+      "label": "Forest & Nature Sounds",
+      "variants": [
+        {
+          "id": "forest_birds",
+          "name": "Forest Birds",
+          "subtitle": "for Morning Energy",
+          "video_queries": ["forest birds nature", "birds singing forest", "bird sounds trees"],
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=800,lowpass=f=6000,volume=4.5",
+          "tags": ["birds", "nature", "morning", "calm", "forest"]
+        },
+        {
+          "id": "wind_trees",
+          "name": "Wind in Trees",
+          "subtitle": "for Deep Relaxation",
+          "video_queries": ["wind trees leaves", "wind forest", "autumn wind leaves"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=150,lowpass=f=3000,volume=4.0",
+          "tags": ["wind", "nature", "relax", "calm", "forest"]
+        },
+        {
+          "id": "night_crickets",
+          "name": "Night Crickets",
+          "subtitle": "for Sleep & Meditation",
+          "video_queries": ["night crickets", "cricket sounds night", "summer night insects"],
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=1500,lowpass=f=5000,volume=4.5",
+          "tags": ["night", "crickets", "sleep", "nature", "meditation"]
+        },
+        {
+          "id": "morning_birds",
+          "name": "Morning Birds",
+          "subtitle": "for a Fresh Start",
+          "video_queries": ["birds chirping morning", "dawn chorus birds", "morning birds nature"],
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=1000,lowpass=f=7000,volume=4.0",
+          "tags": ["birds", "morning", "nature", "energy", "calm"]
+        },
+        {
+          "id": "forest_rain",
+          "name": "Forest Rain",
+          "subtitle": "for Relaxation",
+          "video_queries": ["forest rain", "rain forest trees", "rainy forest nature"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=300,lowpass=f=5000,volume=5.0",
+          "tags": ["forest", "rain", "nature", "relax", "calm"]
+        },
+        {
+          "id": "windy_forest",
+          "name": "Windy Forest",
+          "subtitle": "for Calm & Peace",
+          "video_queries": ["forest wind", "windy trees swaying", "trees in wind"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=200,lowpass=f=4000,volume=4.0",
+          "tags": ["wind", "forest", "calm", "nature", "relax"]
+        }
+      ]
     },
     {
-      "id": 6,
-      "name": "Forest Birds",
-      "emoji": "\ud83c\udf33",
-      "subtitle": "for Morning Energy",
-      "video_queries": ["forest birds nature", "birds singing forest", "bird sounds trees"],
-      "image_queries": ["forest morning light", "trees birds nature", "green forest calm"],
-      "audio_filter": "anoisesrc=color=pink,highpass=f=800,lowpass=f=6000",
-      "tags": ["birds", "nature", "morning", "calm", "forest"]
+      "id": "fireplace",
+      "label": "Fireplace & Cozy Sounds",
+      "variants": [
+        {
+          "id": "crackling_fire",
+          "name": "Crackling Fireplace",
+          "subtitle": "for Cozy Relaxation",
+          "video_queries": ["fireplace crackling fire", "cozy fireplace", "fire burning logs"],
+          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=2000,highpass=f=80,volume=5.0",
+          "tags": ["fireplace", "cozy", "relax", "ASMR", "fire"]
+        },
+        {
+          "id": "campfire",
+          "name": "Campfire Night",
+          "subtitle": "for Deep Sleep",
+          "video_queries": ["campfire night", "outdoor bonfire", "campfire stars"],
+          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=2500,highpass=f=100,volume=4.5",
+          "tags": ["campfire", "fire", "sleep", "nature", "ASMR"]
+        },
+        {
+          "id": "fire_rain",
+          "name": "Fireplace & Rain",
+          "subtitle": "for Ultimate Comfort",
+          "video_queries": ["indoor fire rain", "cozy fire rainy", "fireplace rain window"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=150,lowpass=f=3000,volume=4.5",
+          "tags": ["fireplace", "rain", "cozy", "comfort", "relax"]
+        },
+        {
+          "id": "wood_fire",
+          "name": "Wood Burning Fire",
+          "subtitle": "for Stress Relief",
+          "video_queries": ["wood fire burning", "log fire", "burning wood fireplace"],
+          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=1800,highpass=f=60,volume=5.0",
+          "tags": ["fire", "wood", "stress relief", "ASMR", "relax"]
+        },
+        {
+          "id": "winter_fire",
+          "name": "Cozy Winter Fire",
+          "subtitle": "for Cozy Evenings",
+          "video_queries": ["winter fireplace cozy", "christmas fireplace", "snowy cabin fire"],
+          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=2200,highpass=f=90,volume=4.8",
+          "tags": ["fireplace", "winter", "cozy", "christmas", "relax"]
+        },
+        {
+          "id": "candles",
+          "name": "Candles & Silence",
+          "subtitle": "for Meditation",
+          "video_queries": ["candle flame burning", "candles flickering", "candlelight dark"],
+          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=1500,highpass=f=70,volume=3.5",
+          "tags": ["candle", "meditation", "calm", "peace", "ASMR"]
+        }
+      ]
     },
     {
-      "id": 7,
-      "name": "Gentle Rain",
-      "emoji": "\ud83c\udf26\ufe0f",
-      "subtitle": "for Study & Focus",
-      "video_queries": ["gentle rain", "light rain", "soft rain nature"],
-      "image_queries": ["light rain drops", "gentle rain window", "soft rain leaves"],
-      "audio_filter": "anoisesrc=color=brown,highpass=f=400,lowpass=f=4000",
-      "tags": ["rain", "study", "focus", "calm", "relaxing"]
-    },
-    {
-      "id": 8,
-      "name": "River Stream",
-      "emoji": "\ud83c\udfd5\ufe0f",
-      "subtitle": "for Calm & Focus",
-      "video_queries": ["river stream nature", "mountain river", "flowing water stream"],
-      "image_queries": ["river stream forest", "mountain stream calm", "flowing river"],
-      "audio_filter": "anoisesrc=color=white,highpass=f=600,lowpass=f=7000",
-      "tags": ["river", "water", "focus", "nature", "calm"]
-    },
-    {
-      "id": 9,
-      "name": "Night Crickets",
-      "emoji": "\ud83c\udf19",
-      "subtitle": "for Sleep & Meditation",
-      "video_queries": ["night crickets", "cricket sounds night", "summer night insects"],
-      "image_queries": ["night sky stars peaceful", "night field moonlight", "dark night calm"],
-      "audio_filter": "anoisesrc=color=pink,highpass=f=1500,lowpass=f=5000",
-      "tags": ["night", "crickets", "sleep", "nature", "meditation"]
-    },
-    {
-      "id": 10,
-      "name": "Rain on Window",
-      "emoji": "\ud83e\ude9f",
-      "subtitle": "for Cozy Reading",
-      "video_queries": ["rain on window", "rain glass window", "rainy day indoors"],
-      "image_queries": ["rain on window cozy", "rain glass drops", "rainy window inside"],
-      "audio_filter": "anoisesrc=color=brown,highpass=f=350,lowpass=f=4500",
-      "tags": ["rain", "cozy", "relax", "ASMR", "window"]
-    },
-    {
-      "id": 11,
-      "name": "White Noise",
-      "emoji": "\u2b1c",
-      "subtitle": "for Sleep & Focus",
-      "video_queries": ["electric fan noise", "fan spinning white noise", "fan sound"],
-      "noise_color": "white",
-      "image_queries": ["white fog minimalist", "white abstract texture", "white gradient calm"],
-      "audio_filter": "anoisesrc=color=white",
-      "tags": ["white noise", "sleep", "focus", "ASMR", "baby sleep"]
-    },
-    {
-      "id": 12,
-      "name": "Wind in Trees",
-      "emoji": "\ud83c\udf2c\ufe0f",
-      "subtitle": "for Deep Relaxation",
-      "video_queries": ["wind trees leaves", "wind forest", "autumn wind leaves"],
-      "image_queries": ["wind trees leaves autumn", "forest wind calm", "trees swaying wind"],
-      "audio_filter": "anoisesrc=color=brown,highpass=f=150,lowpass=f=3000",
-      "tags": ["wind", "nature", "relax", "calm", "forest"]
-    },
-    {
-      "id": 13,
-      "name": "Morning Birds",
-      "emoji": "\ud83d\udc26",
-      "subtitle": "for a Fresh Start",
-      "video_queries": ["birds chirping morning", "dawn chorus birds", "morning birds nature"],
-      "image_queries": ["morning sunrise nature", "dawn birds trees", "morning mist forest"],
-      "audio_filter": "anoisesrc=color=pink,highpass=f=1000,lowpass=f=7000",
-      "tags": ["birds", "morning", "nature", "energy", "calm"]
-    },
-    {
-      "id": 14,
-      "name": "Tropical Rain",
-      "emoji": "\ud83c\udf34",
-      "subtitle": "for Deep Sleep",
-      "video_queries": ["tropical rain forest", "jungle rain", "rainforest tropical"],
-      "image_queries": ["tropical rainforest rain", "jungle green rain", "tropical forest"],
-      "audio_filter": "anoisesrc=color=brown,highpass=f=250,lowpass=f=6000",
-      "tags": ["rain", "tropical", "sleep", "nature", "jungle"]
-    },
-    {
-      "id": 15,
-      "name": "Cafe Ambiance",
-      "emoji": "\u2615",
-      "subtitle": "for Study & Work",
-      "video_queries": ["coffee shop ambient", "cafe background", "coffee shop people"],
-      "image_queries": ["coffee shop cozy", "cafe warm light", "coffee shop table"],
-      "audio_filter": "anoisesrc=color=pink,highpass=f=200,lowpass=f=4000",
-      "tags": ["cafe", "study", "work", "focus", "ambient"]
-    },
-    {
-      "id": 16,
-      "name": "Brown Noise",
-      "emoji": "\ud83d\udfe7",
-      "subtitle": "for Deep Focus",
-      "video_queries": ["brown noise low frequency", "deep drone noise", "bass rumble sound"],
-      "noise_color": "brown",
-      "image_queries": ["dark forest trees brown", "brown earth tones minimal", "dark minimal calm"],
-      "audio_filter": "anoisesrc=color=brown",
-      "tags": ["brown noise", "focus", "ADHD", "deep work", "concentration"]
-    },
-    {
-      "id": 17,
-      "name": "Snowfall",
-      "emoji": "\u2744\ufe0f",
-      "subtitle": "for Peace & Calm",
-      "video_queries": ["snowfall silent forest", "snow falling winter", "winter snow scene"],
-      "image_queries": ["snowfall winter forest", "snow falling peaceful", "winter white snow"],
-      "audio_filter": "anoisesrc=color=brown,highpass=f=100,lowpass=f=1500",
-      "tags": ["snow", "winter", "calm", "peaceful", "relaxing"]
-    },
-    {
-      "id": 18,
-      "name": "Pink Noise",
-      "emoji": "\ud83e\udda9",
-      "subtitle": "for Deep Sleep",
-      "video_queries": ["soft static noise", "white noise machine sleep", "noise fan sleep"],
-      "noise_color": "pink",
-      "image_queries": ["pink gradient soft", "pink pastel abstract", "pink sky sunrise calm"],
-      "audio_filter": "anoisesrc=color=pink",
-      "tags": ["pink noise", "sleep", "relaxation", "calm", "baby sleep"]
-    },
-    {
-      "id": 19,
-      "name": "Underwater",
-      "emoji": "\ud83d\udc20",
-      "subtitle": "for Meditation",
-      "video_queries": ["underwater ocean calm", "underwater bubbles peaceful", "deep underwater blue"],
-      "image_queries": ["underwater ocean blue", "underwater calm peaceful", "deep sea blue"],
-      "audio_filter": "anoisesrc=color=brown,lowpass=f=300,acompressor=threshold=0.1:ratio=5:attack=500:release=2000",
-      "tags": ["underwater", "meditation", "calm", "ocean", "relax"]
-    },
-    {
-      "id": 20,
-      "name": "Fan Sound",
-      "emoji": "\ud83d\udca8",
-      "subtitle": "for Sleep & White Noise",
-      "video_queries": ["ceiling fan spinning", "electric fan bedroom", "fan rotating slow"],
-      "noise_color": "white",
-      "image_queries": ["fan minimal dark room", "dark minimal bedroom", "dark gradient calm"],
-      "audio_filter": "anoisesrc=color=white,lowpass=f=2500",
-      "tags": ["fan", "white noise", "sleep", "ASMR", "noise machine"]
-    },
-    {
-      "id": 21,
-      "name": "Vacuum Cleaner",
-      "emoji": "\ud83c\udf00",
-      "subtitle": "for Baby Sleep & Focus",
-      "video_queries": ["vacuum cleaner sound", "hoover vacuum cleaning", "vacuum white noise"],
-      "noise_color": "white",
-      "image_queries": ["clean white floor minimal", "white minimal clean space", "white room clean light"],
-      "audio_filter": "anoisesrc=color=white,highpass=f=200,lowpass=f=3500",
-      "tags": ["vacuum", "white noise", "baby sleep", "ASMR", "focus"]
+      "id": "deep_sleep",
+      "label": "Deep Sleep & Brown Noise",
+      "variants": [
+        {
+          "id": "brown_noise",
+          "name": "Brown Noise",
+          "subtitle": "for Deep Focus",
+          "video_queries": ["dark forest night", "dark nature peaceful", "night sky stars"],
+          "audio_lavfi": "anoisesrc=color=brown,volume=4.0",
+          "tags": ["brown noise", "focus", "ADHD", "deep work", "concentration"]
+        },
+        {
+          "id": "delta_waves",
+          "name": "Delta Waves",
+          "subtitle": "Delta Waves for Sleep",
+          "video_queries": ["deep sleep night", "dark room peaceful", "night moon calm"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*2*t)*0.3+sin(2*PI*1*t)*0.2:s=44100:c=stereo,volume=3.0",
+          "tags": ["delta waves", "sleep", "deep sleep", "meditation", "calm"]
+        },
+        {
+          "id": "40hz_gamma",
+          "name": "40Hz Gamma Waves",
+          "subtitle": "40Hz Focus & Memory",
+          "video_queries": ["space stars universe", "dark minimal", "cosmos stars"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*40*t)*0.4+sin(2*PI*80*t)*0.2+sin(2*PI*20*t)*0.15:s=44100:c=stereo,volume=2.5",
+          "tags": ["40hz", "gamma waves", "focus", "memory", "brain waves"]
+        },
+        {
+          "id": "snowfall",
+          "name": "Snowfall Silence",
+          "subtitle": "for Peace & Calm",
+          "video_queries": ["snowfall winter forest", "snow falling peaceful", "winter snow silence"],
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=100,lowpass=f=1500,volume=3.5",
+          "tags": ["snow", "winter", "calm", "peaceful", "relaxing"]
+        },
+        {
+          "id": "deep_ocean",
+          "name": "Deep Ocean",
+          "subtitle": "for Meditation & Sleep",
+          "video_queries": ["deep ocean dark", "underwater dark calm", "deep sea blue"],
+          "audio_lavfi": "anoisesrc=color=brown,lowpass=f=200,volume=4.5",
+          "tags": ["ocean", "deep", "meditation", "sleep", "calm"]
+        },
+        {
+          "id": "low_drone",
+          "name": "Low Frequency Drone",
+          "subtitle": "for Deep Relaxation",
+          "video_queries": ["dark abstract minimal", "dark gradient calm", "minimal dark space"],
+          "audio_lavfi": "aevalsrc=sin(2*PI*60*t)*0.4+sin(2*PI*120*t)*0.2+sin(2*PI*30*t)*0.15:s=44100:c=stereo,volume=2.5",
+          "tags": ["drone", "low frequency", "meditation", "deep", "relax"]
+        }
+      ]
     }
   ]
 }

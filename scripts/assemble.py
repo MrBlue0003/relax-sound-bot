@@ -97,9 +97,7 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     out_str = str(output_path.resolve()).replace("\\", "/")
 
     # Determine audio source: themed synthetic noise via ffmpeg lavfi
-    audio_filter = theme.get("audio_filter", "anoisesrc=color=brown")
-    # Volume boost since anoisesrc is quiet
-    audio_lavfi = f"{audio_filter},volume=4.0"
+    audio_lavfi = theme.get("audio_lavfi", "anoisesrc=color=brown,volume=4.0")
 
     if is_video:
         ffmpeg_args = [
