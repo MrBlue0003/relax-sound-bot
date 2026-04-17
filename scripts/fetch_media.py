@@ -13,13 +13,18 @@ MIN_SIZE_KB = 300
 
 
 def download_video(query: str, output_path: Path, api_key: str,
-                   min_size_kb: int = MIN_SIZE_KB) -> Path | None:
-    """Search Pixabay for a short video clip and download it. Returns Path or None."""
+                   min_size_kb: int = MIN_SIZE_KB,
+                   skip: int = 0) -> Path | None:
+    """Search Pixabay for a short video clip and download it. Returns Path or None.
+
+    skip: skip the first N valid hits — use slot_in_day (0,1,2) so each daily
+          post picks a different clip even when queries are similar.
+    """
     params = {
         "key": api_key,
         "q": query,
         "video_type": "all",
-        "per_page": 15,
+        "per_page": 20,
         "safesearch": "true",
     }
     try:
@@ -37,6 +42,7 @@ def download_video(query: str, output_path: Path, api_key: str,
     # Prefer clips close to 20s duration
     hits_sorted = sorted(hits, key=lambda h: abs(h.get("duration", 99) - 20))
 
+    skipped = 0
     for hit in hits_sorted:
         videos = hit.get("videos", {})
         video = videos.get("medium") or videos.get("small") or videos.get("large")
@@ -44,6 +50,11 @@ def download_video(query: str, output_path: Path, api_key: str,
             continue
         url = video.get("url")
         if not url:
+            continue
+        # Skip first N valid candidates so each slot gets a different video
+        if skipped < skip:
+            skipped += 1
+            logger.debug(f"Skipping hit (skip={skip}, skipped={skipped}): id={hit.get('id')}")
             continue
         try:
             resp = requests.get(url, stream=True, timeout=60)
@@ -70,25 +81,35 @@ def download_video(query: str, output_path: Path, api_key: str,
 
 
 def download_video_with_fallbacks(queries: list[str], output_path: Path,
-                                   api_key: str) -> Path | None:
-    """Try each query in order until a video is found."""
+                                   api_key: str, skip: int = 0) -> Path | None:
+    """Try each query in order until a video is found.
+
+    skip: passed to download_video so each daily slot gets a different clip.
+    """
     for i, q in enumerate(queries):
         label = "primary" if i == 0 else f"fallback #{i}"
-        logger.info(f"Trying {label} query: '{q}'")
-        path = download_video(q, output_path, api_key)
+        logger.info(f"Trying {label} query: '{q}' (skip={skip})")
+        path = download_video(q, output_path, api_key, skip=skip)
         if path:
             return path
+        # If skipping caused no results, retry without skip
+        if skip > 0:
+            logger.info(f"No result with skip={skip}, retrying '{q}' without skip")
+            path = download_video(q, output_path, api_key, skip=0)
+            if path:
+                return path
         time.sleep(0.3)
     return None
 
 
-def download_image(query: str, output_path: Path, api_key: str) -> Path | None:
+def download_image(query: str, output_path: Path, api_key: str,
+                   skip: int = 0) -> Path | None:
     """Download a Pixabay image. Returns Path or None."""
     params = {
         "key": api_key,
         "q": query,
         "image_type": "photo",
-        "per_page": 10,
+        "per_page": 20,
         "safesearch": "true",
         "min_width": 1080,
     }
@@ -100,9 +121,13 @@ def download_image(query: str, output_path: Path, api_key: str) -> Path | None:
         logger.warning(f"Image search failed '{query}': {e}")
         return None
 
+    skipped = 0
     for hit in hits:
         url = hit.get("largeImageURL") or hit.get("webformatURL")
         if not url:
+            continue
+        if skipped < skip:
+            skipped += 1
             continue
         try:
             resp = requests.get(url, stream=True, timeout=30)
@@ -118,10 +143,10 @@ def download_image(query: str, output_path: Path, api_key: str) -> Path | None:
 
 
 def download_image_with_fallbacks(queries: list[str], output_path: Path,
-                                   api_key: str) -> Path | None:
+                                   api_key: str, skip: int = 0) -> Path | None:
     """Try each image query until one works."""
     for q in queries:
-        path = download_image(q, output_path, api_key)
+        path = download_image(q, output_path, api_key, skip=skip)
         if path:
             return path
         time.sleep(0.2)

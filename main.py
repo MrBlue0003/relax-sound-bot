@@ -50,8 +50,10 @@ def setup_logging() -> None:
 logger = logging.getLogger("main")
 
 
-def pick_variant() -> dict:
-    """Pick next variant using 7-category weekly rotation."""
+def pick_variant() -> tuple[dict, int]:
+    """Pick next variant using 7-category weekly rotation.
+    Returns (variant, slot_in_day) where slot_in_day is 0/1/2.
+    """
     with open(config.SOUNDS_FILE, encoding="utf-8") as f:
         data = json.load(f)
     categories = data["categories"]
@@ -66,7 +68,7 @@ def pick_variant() -> dict:
     week_num = upload_count // 21
     slot_in_week = upload_count % 21
     day_idx = slot_in_week // 3       # 0–6: which day of the week
-    slot_in_day = slot_in_week % 3    # 0–2: which post of the day
+    slot_in_day = slot_in_week % 3    # 0–2: which post of the day (used as video skip offset)
 
     # Rotate which category appears on which day each week
     cat_idx = (day_idx + week_num) % len(categories)
@@ -82,7 +84,7 @@ def pick_variant() -> dict:
         f"Day {day_idx + 1}/7 | Slot {slot_in_day + 1}/3 | "
         f"Category: {category['label']} | Variant: {variant['name']}"
     )
-    return variant
+    return variant, slot_in_day
 
 
 def get_work_dir(timestamp: str) -> Path:
@@ -108,7 +110,7 @@ def main() -> int:
         return 1
 
     try:
-        variant = pick_variant()
+        variant, slot_in_day = pick_variant()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         work_dir = get_work_dir(timestamp)
 
@@ -116,18 +118,20 @@ def main() -> int:
         image_path = work_dir / "bg.jpg"
         media_path = None
 
+        # slot_in_day (0/1/2) is used as skip offset so each daily post
+        # picks a different video/image even when queries are similar
         video_queries = variant.get("video_queries", [])
         if video_queries:
-            logger.info(f"Searching Pixabay videos for: {video_queries}")
+            logger.info(f"Searching Pixabay videos for: {video_queries} (skip={slot_in_day})")
             media_path = download_video_with_fallbacks(
-                video_queries, video_path, config.PIXABAY_API_KEY
+                video_queries, video_path, config.PIXABAY_API_KEY, skip=slot_in_day
             )
 
         if not media_path:
             logger.info("No video found — falling back to image + generated audio")
             image_queries = variant.get("image_queries", [variant["name"]])
             media_path = download_image_with_fallbacks(
-                image_queries, image_path, config.PIXABAY_API_KEY
+                image_queries, image_path, config.PIXABAY_API_KEY, skip=slot_in_day
             )
 
         if not media_path:
