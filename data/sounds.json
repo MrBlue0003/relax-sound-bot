@@ -9,7 +9,7 @@
           "name": "Heavy Rain",
           "subtitle": "for Deep Sleep",
           "video_queries": ["heavy rain", "rain storm", "rain drops"],
-          "audio_lavfi": "anoisesrc=color=brown,highpass=f=300,lowpass=f=5000,volume=5.0",
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=180,lowpass=f=8000,volume=6.5",
           "tags": ["rain", "sleep", "ASMR", "white noise", "relaxing"]
         },
         {
@@ -17,7 +17,7 @@
           "name": "Thunderstorm Rain",
           "subtitle": "for Deep Sleep",
           "video_queries": ["thunderstorm rain", "storm lightning rain", "thunder rain"],
-          "audio_lavfi": "anoisesrc=color=brown,highpass=f=200,lowpass=f=6000,volume=6.0",
+          "audio_lavfi": "anoisesrc=color=brown,highpass=f=60,lowpass=f=3500,volume=7.5",
           "tags": ["storm", "thunder", "rain", "sleep", "ASMR"]
         },
         {
@@ -25,7 +25,7 @@
           "name": "Gentle Rain",
           "subtitle": "for Study & Focus",
           "video_queries": ["gentle rain", "light rain", "soft rain nature"],
-          "audio_lavfi": "anoisesrc=color=brown,highpass=f=400,lowpass=f=4000,volume=4.0",
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=600,lowpass=f=7000,volume=3.8",
           "tags": ["rain", "study", "focus", "calm", "relaxing"]
         },
         {
@@ -33,7 +33,7 @@
           "name": "Rain on Window",
           "subtitle": "for Cozy Reading",
           "video_queries": ["rain on window", "rain glass window", "rainy day indoors"],
-          "audio_lavfi": "anoisesrc=color=brown,highpass=f=350,lowpass=f=4500,volume=4.5",
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=1200,lowpass=f=6500,volume=3.2",
           "tags": ["rain", "cozy", "relax", "ASMR", "window"]
         },
         {
@@ -41,7 +41,7 @@
           "name": "Tropical Rain",
           "subtitle": "for Relaxation",
           "video_queries": ["tropical rain forest", "jungle rain", "rainforest rain"],
-          "audio_lavfi": "anoisesrc=color=brown,highpass=f=250,lowpass=f=6000,volume=5.5",
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=280,lowpass=f=10000,volume=5.8",
           "tags": ["rain", "tropical", "sleep", "nature", "jungle"]
         },
         {
@@ -49,7 +49,7 @@
           "name": "Summer Rain",
           "subtitle": "for Sleep & Calm",
           "video_queries": ["summer rain", "warm rain", "rain garden nature"],
-          "audio_lavfi": "anoisesrc=color=brown,highpass=f=320,lowpass=f=4800,volume=4.8",
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=500,lowpass=f=8500,volume=4.2",
           "tags": ["rain", "sleep", "calm", "nature", "relaxing"]
         }
       ]
