@@ -89,7 +89,7 @@ def pick_variant() -> tuple[dict, int]:
 
 def get_work_dir(timestamp: str) -> Path:
     if os.name == "nt":
-        work_dir = Path(f"C:/temp/rs/{timestamp}")
+        work_dir = Path(f"E:/temp/rs/{timestamp}")
     else:
         work_dir = config.OUTPUT_DIR / timestamp
     work_dir.mkdir(parents=True, exist_ok=True)
