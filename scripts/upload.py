@@ -150,6 +150,61 @@ def upload_video(video_path: Path, variant: dict) -> str:
                 raise
 
 
+def upload_compilation(video_path: Path, month_str: str, youtube=None) -> str:
+    """Upload a monthly Best Of compilation. Returns video_id."""
+    if not video_path.exists():
+        raise FileNotFoundError(f"Compilation video not found: {video_path}")
+
+    if youtube is None:
+        youtube = get_youtube_client()
+
+    title = f"Best of {month_str} \U0001f33f | Relax Sound Compilation"
+    if len(title) > 100:
+        title = title[:97] + "\u2026"
+
+    description = (
+        f"\U0001f3b5 Best of {month_str} \u2014 top relaxing sounds of the month!\n\n"
+        "Our most-watched relaxation videos in one place:\n"
+        "\U0001f327 Rain sounds \u2022 \U0001f9d8 Meditation tones \u2022 \U0001f30a Ocean waves\n"
+        "\U0001f333 Forest ambience \u2022 \U0001f525 Fireplace crackling \u2022 \U0001f634 Deep sleep sounds\n\n"
+        "#relaxingsounds #sleepsounds #ASMR #meditation #relaxation #compilation\n\n"
+        "\U0001f514 Subscribe for daily relaxation sounds.\n"
+        "\U0001f50a Turn on sound for the full experience!"
+    )
+
+    body = {
+        "snippet": {
+            "title": title,
+            "description": description,
+            "tags": ["best of", "compilation", "relaxing sounds", "sleep sounds",
+                     "ASMR", "meditation", "ambient", month_str.lower()],
+            "categoryId": "22",
+            "defaultLanguage": "en",
+        },
+        "status": {
+            "privacyStatus": "public",
+            "selfDeclaredMadeForKids": False,
+            "madeForKids": False,
+        },
+    }
+
+    media = MediaFileUpload(
+        str(video_path), mimetype="video/mp4", resumable=True, chunksize=256 * 1024
+    )
+
+    logger.info(f"Uploading compilation: {title}")
+    request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
+    response = None
+    while response is None:
+        status, response = request.next_chunk()
+        if status:
+            logger.info(f"Compilation upload: {int(status.progress() * 100)}%")
+
+    video_id = response["id"]
+    logger.info(f"Compilation uploaded: https://www.youtube.com/watch?v={video_id}")
+    return video_id
+
+
 def _record_upload(video_id: str, title: str, variant: dict) -> None:
     f = config.UPLOADED_FILE
     data: dict = {"uploads": []}

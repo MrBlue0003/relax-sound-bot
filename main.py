@@ -33,6 +33,7 @@ from scripts.fetch_media import (
 )
 from scripts.assemble import build_video
 from scripts.upload import upload_video
+import scripts.monthly_compilation as monthly_compilation
 
 
 def setup_logging() -> None:
@@ -152,6 +153,23 @@ def main() -> int:
         logger.info("=" * 60)
 
         shutil.rmtree(work_dir, ignore_errors=True)
+
+        # Monthly Best Of compilation — runs automatically on day 1-3 of each month
+        if monthly_compilation.should_run(config.UPLOADED_FILE):
+            logger.info("Monthly Best Of compilation triggered")
+            try:
+                comp_id = monthly_compilation.run(
+                    config.UPLOADED_FILE,
+                    config.OUTPUT_DIR,
+                )
+                if comp_id:
+                    logger.info(f"Compilation: https://www.youtube.com/watch?v={comp_id}")
+            except Exception as comp_err:
+                logger.error(
+                    f"Monthly compilation failed (non-fatal): {comp_err}\n"
+                    f"{traceback.format_exc()}"
+                )
+
         return 0
 
     except Exception as e:
