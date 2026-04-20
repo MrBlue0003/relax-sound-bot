@@ -85,13 +85,20 @@ def upload_video(video_path: Path, variant: dict) -> str:
     if len(title) > 100:
         title = title[:97] + "\u2026"
 
-    hashtags = " ".join(f"#{t.replace(' ', '')}" for t in tags_base[:8])
+    hashtags = (
+        "#Shorts #RelaxingSounds #SleepSounds #ASMR #Meditation #NatureSounds "
+        "#AmbientSound #ChillVibes #StressRelief #SleepMusic #CalmMusic "
+        "#Mindfulness #RelaxingMusic #SoundHealing #WhiteNoise #DeepSleep "
+        "#AnxietyRelief #PeacefulMusic #ZenMusic #LofiChill #RelaxAndUnwind "
+        "#SleepAid #MeditationMusic #BackgroundMusic #FocusMusic "
+        + " ".join(f"#{t.replace(' ', '')}" for t in tags_base[:10])
+    )
     description = (
-        f"\ud83c\udfb5 {name}\n"
+        f"\U0001f3b5 {name}\n"
         f"{subtitle}\n\n"
-        f"{hashtags} #shorts #relaxingsounds #sleepsounds #ASMR #meditation\n\n"
-        f"\ud83d\udd0a Turn on sound for the full experience!\n"
-        f"\ud83c\udf3f Subscribe for daily relaxation sounds."
+        f"\U0001f50a Turn on sound for the full experience!\n"
+        f"\U0001f33f Subscribe for daily relaxation sounds. \U0001f514\n\n"
+        f"{hashtags}"
     )
 
     youtube = get_youtube_client()
