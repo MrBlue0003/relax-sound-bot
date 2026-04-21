@@ -68,6 +68,74 @@ def _verify_channel(youtube) -> tuple[str, str]:
     return channel_id, channel_name
 
 
+# ── Per-category thematic hashtags ───────────────────────────────────────────
+_CATEGORY_HASHTAGS = {
+    "rain": (
+        "#RainSounds #RainyDay #RainASMR #RainVibes #RainNoise #RainingOutside "
+        "#RainOnWindow #HeavyRain #ThunderstormSounds #RainRelax #RainAndThunder "
+        "#RainForSleeping #RainfallSounds #RainBackground #TropicalRain "
+        "#SummerRain #RainMeditation #RainSoundscape #RainyNight #RainLoops"
+    ),
+    "forest": (
+        "#ForestSounds #BirdSounds #BirdChirping #NatureSounds #BirdSinging "
+        "#MorningBirds #ForestBirds #WildBirds #BirdWatching #BirdLovers "
+        "#BirdLife #SongBirds #ForestAmbience #NatureASMR #WoodlandSounds "
+        "#ForestWalk #NatureTherapy #BirdCalls #TreeSounds #WildNature "
+        "#ForestMeditation #BirdNature #NatureSoundscape #OutdoorSounds "
+        "#Birding #WildlifeSound #ForestRelax #NatureVibes #OrnithoLovers"
+    ),
+    "ocean": (
+        "#OceanSounds #WaveSounds #BeachSounds #OceanWaves #SeaSounds "
+        "#BeachASMR #WaterfallSounds #RiverSounds #WaterSounds #OceanRelax "
+        "#CoastalSounds #TidalWaves #BeachVibes #OceanAmbience #SeaTherapy "
+        "#WaterNoise #CreekSounds #StreamSounds #UnderwaterSounds #TropicalBeach "
+        "#OceanMeditation #BeachMeditation #WaveLoops #NatureOcean #BlueMind"
+    ),
+    "meditation": (
+        "#MeditationMusic #432Hz #528Hz #HealingFrequencies #TibetanBowls "
+        "#SingingBowls #BinauralBeats #SoundHealing #ChakraHealing #ZenMusic "
+        "#MindfulMeditation #GuidedMeditation #SoundBath #HealingTones "
+        "#FrequencyHealing #SolfeggioFrequencies #ThetaWaves #AlphaWaves "
+        "#DeltaWaves #BrainwaveEntrainment #CrystalBowls #SoundTherapy "
+        "#EnergyHealing #SpiritualMusic #AncientTones #VibrationalHealing"
+    ),
+    "white_noise": (
+        "#WhiteNoise #PinkNoise #BrownNoise #WhiteNoiseASMR #NoiseMachine "
+        "#FanSound #AirConditioner #SleepNoise #BabySleep #FocusNoise "
+        "#ConcentrationSound #StudyNoise #OfficeBackground #StaticNoise "
+        "#ColoredNoise #NoiseBlocking #TinnitusMasking #ADHDFocus #SleepAid"
+    ),
+    "fireplace": (
+        "#FireplaceSounds #CracklingFire #CampfireSounds #FireASMR "
+        "#CozyFireplace #WinterFireplace #FireplaceAmbience #BonfireSound "
+        "#CampfireNight #WoodBurning #CozyVibes #WarmFireplace #FireRelax "
+        "#FireplaceMeditation #CabinFireplace #FireAndRain #WoodCrackling "
+        "#CozyWinter #Candlelight #FireLoops #HyggeVibes #CozySounds"
+    ),
+    "deep_sleep": (
+        "#DeepSleep #SleepSounds #SleepMusic #InsomniaCure #BetterSleep "
+        "#SleepTherapy #SleepMeditation #NightSounds #SleepingMusic "
+        "#GoodNightSounds #DeltaWaves #BrainwaveSleep #SleepRelaxation "
+        "#PowerNap #NapMusic #SleepASMR #BabySleep #SleepNoises "
+        "#KidsAsleep #SoothingNight #NightRelax #SleepStories #DreamSound"
+    ),
+}
+
+# ── Universal viral hashtags ──────────────────────────────────────────────────
+_UNIVERSAL_HASHTAGS = (
+    "#Shorts #RelaxingSounds #ASMR #Meditation #NatureSounds "
+    "#AmbientSound #ChillVibes #StressRelief #SleepMusic #CalmMusic "
+    "#Mindfulness #RelaxingMusic #AnxietyRelief #PeacefulMusic #ZenMusic "
+    "#LofiChill #RelaxAndUnwind #SleepAid #MeditationMusic #BackgroundMusic "
+    "#FocusMusic #SelfCare #MentalHealth #ChillOut #Calming #Soothing "
+    "#Relaxation #DeStress #InnerPeace #MindBody #Wellness #Soundscape "
+    "#AmbientMusic #Tranquil #NatureTherapy #HealingMusic #YogaMusic "
+    "#BreathingExercise #MindfulLiving #PositiveVibes #GoodVibesOnly "
+    "#TikTokRelax #Trending #Viral #SleepTok #MeditationTok #ASMRCommunity "
+    "#RelaxationStation #ChillZone #SoundTherapy #NatureLovers #Peaceful"
+)
+
+
 def upload_video(video_path: Path, variant: dict) -> str:
     """Upload video to YouTube. Returns video_id."""
     if not video_path.exists():
@@ -76,28 +144,35 @@ def upload_video(video_path: Path, variant: dict) -> str:
     name = variant["name"]
     subtitle = variant["subtitle"]
     tags_base = variant.get("tags", [])
-    tags = list(set(tags_base + [
-        "relaxing sounds", "sleep sounds", "ASMR", "shorts",
-        "relax", "meditation", "ambient sounds", "nature sounds",
-    ]))
+    category_id = variant.get("category_id", "")
+
+    # Build thematic tags list (deduplicated)
+    all_tags = list(dict.fromkeys(
+        tags_base + [
+            "relaxing sounds", "sleep sounds", "ASMR", "shorts",
+            "relax", "meditation", "ambient sounds", "nature sounds",
+            "stress relief", "calm music", "chillout", "focus music",
+            "sleep music", "background music", "white noise", "sound therapy",
+        ]
+    ))
 
     title = f"{name} \u2022 {subtitle} #Shorts"
     if len(title) > 100:
         title = title[:97] + "\u2026"
 
-    hashtags = (
-        "#Shorts #RelaxingSounds #SleepSounds #ASMR #Meditation #NatureSounds "
-        "#AmbientSound #ChillVibes #StressRelief #SleepMusic #CalmMusic "
-        "#Mindfulness #RelaxingMusic #SoundHealing #WhiteNoise #DeepSleep "
-        "#AnxietyRelief #PeacefulMusic #ZenMusic #LofiChill #RelaxAndUnwind "
-        "#SleepAid #MeditationMusic #BackgroundMusic #FocusMusic "
-        + " ".join(f"#{t.replace(' ', '')}" for t in tags_base[:10])
-    )
+    # Category-specific hashtags + variant tags + universal viral
+    cat_tags = _CATEGORY_HASHTAGS.get(category_id, "")
+    variant_hashtags = " ".join(f"#{t.replace(' ', '')}" for t in tags_base[:15])
+    hashtags = f"{_UNIVERSAL_HASHTAGS}\n{cat_tags}\n{variant_hashtags}"
+
     description = (
         f"\U0001f3b5 {name}\n"
         f"{subtitle}\n\n"
         f"\U0001f50a Turn on sound for the full experience!\n"
-        f"\U0001f33f Subscribe for daily relaxation sounds. \U0001f514\n\n"
+        f"\U0001f33f Subscribe for daily relaxation sounds \U0001f514\n"
+        f"\U0001f514 New videos 3x per day — every day!\n\n"
+        f"---\n"
+        f"Perfect for: sleep, study, meditation, yoga, focus, stress relief & relaxation.\n\n"
         f"{hashtags}"
     )
 

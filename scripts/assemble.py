@@ -59,6 +59,20 @@ def _run_ffmpeg(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
     return result
 
 
+def _video_has_audio(video_path: Path) -> bool:
+    """Return True if video file contains an audio stream."""
+    try:
+        r = subprocess.run(
+            ["ffprobe", "-v", "quiet", "-select_streams", "a:0",
+             "-show_entries", "stream=codec_type", "-of", "csv=p=0",
+             str(video_path)],
+            capture_output=True, text=True, timeout=15,
+        )
+        return "audio" in r.stdout
+    except Exception:
+        return False
+
+
 def build_video(theme: dict, media_path: Path, output_path: Path,
                 duration: int = 90, audio_path: Path | None = None) -> Path:
     """
@@ -96,32 +110,55 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     media_str = str(media_path.resolve()).replace("\\", "/")
     out_str = str(output_path.resolve()).replace("\\", "/")
 
-    # Determine audio source: themed synthetic noise via ffmpeg lavfi
+    # Lavfi fallback — only used when video has no audio or media is image
     audio_lavfi = theme.get("audio_lavfi", "anoisesrc=color=brown,volume=4.0")
 
-    if is_video:
+    if is_video and _video_has_audio(media_path):
+        # ── Use original video audio — birds chirp, rain falls, waves crash ──
+        logger.info("Using original video audio (matches visuals)")
+        ffmpeg_args = [
+            "ffmpeg", "-y",
+            "-stream_loop", "-1", "-i", media_str,
+            "-t", str(duration),
+            "-filter_complex",
+            f"[0:v]{vf}[vout];"
+            f"[0:a]aloop=loop=-1:size=2e+09,atrim=duration={duration},"
+            f"volume=2.5,afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
+            "-map", "[vout]", "-map", "[aout]",
+            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+            "-c:a", "aac", "-b:a", "128k",
+            "-movflags", "+faststart",
+            out_str,
+        ]
+    elif is_video:
+        # ── Video has no audio → synthetic fallback ──
+        logger.info("Video mute — using synthetic lavfi audio")
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-stream_loop", "-1", "-i", media_str,
             "-f", "lavfi", "-i", audio_lavfi,
             "-t", str(duration),
             "-filter_complex",
-            f"[0:v]{vf}[vout]",
-            "-map", "[vout]", "-map", "1:a",
+            f"[0:v]{vf}[vout];"
+            f"[1:a]afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
+            "-map", "[vout]", "-map", "[aout]",
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
             "-c:a", "aac", "-b:a", "128k",
             "-movflags", "+faststart",
             out_str,
         ]
     else:
-        # Image + themed noise
+        # ── Image + synthetic audio ──
+        logger.info("Image input — using synthetic lavfi audio")
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-loop", "1", "-i", media_str,
             "-f", "lavfi", "-i", audio_lavfi,
             "-t", str(duration),
-            "-filter_complex", f"[0:v]{vf}[vout]",
-            "-map", "[vout]", "-map", "1:a",
+            "-filter_complex",
+            f"[0:v]{vf}[vout];"
+            f"[1:a]afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
+            "-map", "[vout]", "-map", "[aout]",
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
             "-c:a", "aac", "-b:a", "128k",
             "-shortest",
