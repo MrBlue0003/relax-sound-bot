@@ -54,38 +54,64 @@ logger = logging.getLogger("main")
 def pick_variant() -> tuple[dict, int]:
     """Pick next variant using 7-category weekly rotation.
     Returns (variant, slot_in_day) where slot_in_day is 0/1/2.
+    Never repeats a variant that appeared in the last 21 uploads.
     """
     with open(config.SOUNDS_FILE, encoding="utf-8") as f:
         data = json.load(f)
     categories = data["categories"]
 
     upload_count = 0
+    recent_variants: set[str] = set()
     if config.UPLOADED_FILE.exists():
         with open(config.UPLOADED_FILE, encoding="utf-8") as f:
             log = json.load(f)
-        upload_count = len(log.get("uploads", []))
+        uploads = log.get("uploads", [])
+        upload_count = len(uploads)
+        # Collect variant_ids from last 21 posts (full week cycle)
+        recent_variants = {
+            u["variant_id"] for u in uploads[-21:]
+            if u.get("variant_id")
+        }
 
     # 21 slots per week (7 days × 3 posts/day)
-    week_num = upload_count // 21
+    week_num   = upload_count // 21
     slot_in_week = upload_count % 21
-    day_idx = slot_in_week // 3       # 0–6: which day of the week
-    slot_in_day = slot_in_week % 3    # 0–2: which post of the day (used as video skip offset)
+    day_idx    = slot_in_week // 3
+    slot_in_day = slot_in_week % 3
 
-    # Rotate which category appears on which day each week
-    cat_idx = (day_idx + week_num) % len(categories)
-    category = categories[cat_idx]
+    # Build full flat list of all variants (42 total)
+    all_variants = []
+    for cat in categories:
+        for v in cat["variants"]:
+            entry = dict(v)
+            entry["category_id"] = cat["id"]
+            all_variants.append(entry)
 
-    # Rotate which variant within the category each week
-    var_idx = (slot_in_day + week_num * 3) % len(category["variants"])
-    variant = dict(category["variants"][var_idx])
-    variant["category_id"] = category["id"]
+    # Pick candidate via rotation
+    base_idx = (upload_count) % len(all_variants)
+    candidate = all_variants[base_idx]
+
+    # If candidate was recently posted, walk forward to find a fresh one
+    if candidate["id"] in recent_variants:
+        for offset in range(1, len(all_variants)):
+            alt = all_variants[(base_idx + offset) % len(all_variants)]
+            if alt["id"] not in recent_variants:
+                candidate = alt
+                logger.info(f"Skipped recently-posted variant, using: {alt['name']}")
+                break
+
+    # Determine category for logging
+    cat_label = next(
+        (c["label"] for c in categories if c["id"] == candidate["category_id"]),
+        candidate["category_id"]
+    )
 
     logger.info(
         f"Upload #{upload_count + 1} | Week {week_num + 1} | "
-        f"Day {day_idx + 1}/7 | Slot {slot_in_day + 1}/3 | "
-        f"Category: {category['label']} | Variant: {variant['name']}"
+        f"Slot {slot_in_day + 1}/3 | "
+        f"Category: {cat_label} | Variant: {candidate['name']}"
     )
-    return variant, slot_in_day
+    return candidate, slot_in_day
 
 
 def get_work_dir(timestamp: str) -> Path:
