@@ -183,7 +183,7 @@ def upload_video(video_path: Path, variant: dict) -> str:
         "snippet": {
             "title": title,
             "description": description,
-            "tags": tags[:30],
+            "tags": all_tags[:30],
             "categoryId": "22",
             "defaultLanguage": "en",
         },
