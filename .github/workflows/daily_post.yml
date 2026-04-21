@@ -2,8 +2,8 @@ name: Relax Sound Daily Post
 
 on:
   schedule:
-    # 5x/day: 06:00, 10:00, 14:00, 18:00, 22:00 UTC = 09:00, 13:00, 17:00, 21:00, 01:00 Bucharest (EEST)
-    - cron: '0 6,10,14,18,22 * * *'
+    # 4x/day: 06:00, 10:00, 14:00, 18:00 UTC = 09:00, 13:00, 17:00, 21:00 Bucharest (EEST)
+    - cron: '0 6,10,14,18 * * *'
   workflow_dispatch:   # allow manual trigger from GitHub UI
 
 jobs:
