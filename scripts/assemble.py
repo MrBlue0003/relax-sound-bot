@@ -60,15 +60,44 @@ def _run_ffmpeg(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
 
 
 def _video_has_audio(video_path: Path) -> bool:
-    """Return True if video file contains an audio stream."""
+    """Return True if video has an audio stream with actual non-silent content.
+    Checks both stream existence AND that mean volume is above -91 dBFS (not silence).
+    """
     try:
+        # Step 1: check if audio stream exists
         r = subprocess.run(
             ["ffprobe", "-v", "quiet", "-select_streams", "a:0",
              "-show_entries", "stream=codec_type", "-of", "csv=p=0",
              str(video_path)],
             capture_output=True, text=True, timeout=15,
         )
-        return "audio" in r.stdout
+        if "audio" not in r.stdout:
+            return False
+
+        # Step 2: measure actual volume — detect silent streams
+        r2 = subprocess.run(
+            ["ffmpeg", "-i", str(video_path),
+             "-t", "10",  # sample first 10 seconds
+             "-af", "volumedetect",
+             "-f", "null", "-"],
+            capture_output=True, text=True, timeout=30,
+        )
+        output = r2.stderr
+        # Look for mean_volume line
+        for line in output.splitlines():
+            if "mean_volume" in line:
+                # e.g. "mean_volume: -91.0 dB" means silence
+                try:
+                    db = float(line.split(":")[1].strip().replace(" dB", ""))
+                    if db < -90.0:
+                        logger.info(f"Audio stream detected but silent (mean={db:.1f}dB) — using lavfi fallback")
+                        return False
+                    logger.info(f"Audio stream OK (mean={db:.1f}dB)")
+                    return True
+                except Exception:
+                    pass
+        # If volumedetect didn't output mean_volume, assume audio is OK
+        return True
     except Exception:
         return False
 
