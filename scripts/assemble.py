@@ -30,16 +30,17 @@ CAT_COLORS = {
 _CAT_COLOR_DEFAULT = "0x222233"
 
 # ── Per-category hook lines (shown for first 3 s) ─────────────────────────────
+# Questions > statements — viewer thinks "that's me" → keeps watching
 CAT_HOOKS = {
-    "rain":       "Close your eyes...",
-    "forest":     "Breathe in nature",
-    "ocean":      "Feel the waves...",
-    "fireplace":  "Get cozy tonight",
-    "meditation": "Clear your mind",
-    "deep_sleep": "Time to sleep...",
-    "white_noise":"Find your focus",
+    "rain":       "Can't sleep?",
+    "forest":     "Feeling stressed?",
+    "ocean":      "Need to relax?",
+    "fireplace":  "Get cozy...",
+    "meditation": "Need to focus?",
+    "deep_sleep": "Can't sleep?",
+    "white_noise":"Stay focused",
 }
-_HOOK_DEFAULT = "Relax and unwind..."
+_HOOK_DEFAULT = "Need to relax?"
 
 
 def _detect_font() -> str:
@@ -145,6 +146,14 @@ def _build_vf(theme: dict, duration: int) -> str:
     name  = esc(theme["name"].upper())
     sub   = esc(theme["subtitle"])
 
+    # Dynamic loop label: "1 MIN LOOP", "2 MIN LOOP", or "60S LOOP" etc.
+    if duration >= 60 and duration % 60 == 0:
+        loop_label = f"{duration // 60} MIN LOOP"
+    elif duration >= 60:
+        loop_label = f"{duration // 60}:{duration % 60:02d} LOOP"
+    else:
+        loop_label = f"{duration}S LOOP"
+
     filters = [
         # ── Canvas ──────────────────────────────────────────────────────────
         f"scale={WIDTH}:{HEIGHT}:force_original_aspect_ratio=increase",
@@ -153,14 +162,27 @@ def _build_vf(theme: dict, duration: int) -> str:
 
         # ── Hook banner (0–3 s) ──────────────────────────────────────────────
         f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.90:t=fill"
-        f":enable='between(t,0,3)'",
+        f":enable='between(t,0,2.5)'",
+        f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.40:t=fill"
+        f":enable='between(t,2.5,2.8)'",
+        f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.10:t=fill"
+        f":enable='between(t,2.8,3.0)'",
         # Thin bottom accent on hook box
         f"drawbox=x=0:y=188:w={WIDTH}:h=7:color={color}:t=fill"
-        f":enable='between(t,0,3)'",
+        f":enable='between(t,0,2.5)'",
+        # Hook text — 3-step alpha fade (full → dim → ghost)
         f"drawtext=fontfile='{font}':text='{hook}'"
         f":fontsize=74:fontcolor=white:x=(w-text_w)/2:y=62"
         f":borderw=3:bordercolor=black@0.55"
-        f":enable='between(t,0,3)'",
+        f":enable='between(t,0,2.5)'",
+        f"drawtext=fontfile='{font}':text='{hook}'"
+        f":fontsize=74:fontcolor=white@0.45:x=(w-text_w)/2:y=62"
+        f":borderw=2:bordercolor=black@0.20"
+        f":enable='between(t,2.5,2.8)'",
+        f"drawtext=fontfile='{font}':text='{hook}'"
+        f":fontsize=74:fontcolor=white@0.10:x=(w-text_w)/2:y=62"
+        f":borderw=0:bordercolor=black@0.00"
+        f":enable='between(t,2.8,3.0)'",
 
         # ── Bottom gradient (3 overlapping semi-transparent layers) ─────────
         f"drawbox=x=0:y=1480:w={WIDTH}:h=440:color=black@0.28:t=fill",
@@ -175,9 +197,12 @@ def _build_vf(theme: dict, duration: int) -> str:
         f":fontsize=84:fontcolor=white:x=(w-text_w)/2:y=1555"
         f":borderw=3:bordercolor={color}@0.40",
 
+        # ── Thin separator line (category colour, between name and subtitle) ──
+        f"drawbox=x=80:y=1652:w={WIDTH - 160}:h=1:color={color}@0.50:t=fill",
+
         # ── Subtitle ─────────────────────────────────────────────────────────
         f"drawtext=fontfile='{font}':text='{sub}'"
-        f":fontsize=42:fontcolor=white@0.93:x=(w-text_w)/2:y=1692"
+        f":fontsize=42:fontcolor=white@0.93:x=(w-text_w)/2:y=1668"
         f":borderw=2:bordercolor=black@0.70",
 
         # ── Progress bar track (full width, dark) ────────────────────────────
@@ -195,7 +220,7 @@ def _build_vf(theme: dict, duration: int) -> str:
         ],
 
         # ── Loop badge ────────────────────────────────────────────────────────
-        f"drawtext=fontfile='{font}':text='LOOP'"
+        f"drawtext=fontfile='{font}':text='{loop_label}'"
         f":fontsize=28:fontcolor=white@0.60:x=(w-text_w)/2:y=1873",
 
         # ── Watermark — bottom-right, very subtle ─────────────────────────────

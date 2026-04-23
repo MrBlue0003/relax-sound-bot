@@ -14,7 +14,8 @@ import sys
 import time
 from pathlib import Path
 
-LOG = Path("logs/uploaded.json")
+LOG       = Path("logs/uploaded.json")
+PLAYLISTS = Path("data/playlists.json")
 
 
 def git(*args, check: bool = True) -> subprocess.CompletedProcess:
@@ -72,6 +73,9 @@ def main() -> int:
         # 6. Reset local HEAD to remote and commit the merged file
         git("reset", "--soft", "origin/main")
         git("add", str(LOG))
+        # Also stage playlists.json — may have gained new playlist IDs this run
+        if PLAYLISTS.exists():
+            git("add", str(PLAYLISTS))
 
         diff = git("diff", "--staged", "--quiet", check=False)
         if diff.returncode == 0:

@@ -168,15 +168,57 @@ _CAT_DESC_HOOKS = {
     "white_noise":"Find your focus and block out distractions.",
 }
 
-# Pinned comment per category — drives engagement (likes, replies, follows)
+# Pinned comment per category — numbered poll format drives replies & watch time
 _CAT_COMMENTS = {
-    "rain":       "🌧️ Which rain sound helps you sleep best? Comment below! 👇\nFollow for 4 new relaxation sounds every day 🔔",
-    "forest":     "🌿 Does nature help you focus or relax? Let me know! 👇\nFollow for daily relaxation sounds 🔔",
-    "ocean":      "🌊 Ocean lover? What's your favorite sound for sleep? 👇\nFollow for 4 new sounds every day 🔔",
-    "fireplace":  "🔥 Cozy vibes! What's your go-to comfort sound? 👇\nFollow for daily relaxation sounds 🔔",
-    "meditation": "🧘 Do you meditate with sound or in silence? 👇\nFollow for 4 new sounds every day 🔔",
-    "deep_sleep": "🌙 Can't sleep? Try this! What helps you sleep best? 👇\nFollow for daily sleep sounds 🔔",
-    "white_noise":"💤 Does white noise help you focus or sleep? 👇\nFollow for 4 new sounds every day 🔔",
+    "rain":
+        "🌧️ What do you use rain sounds for?\n"
+        "1️⃣ Fall asleep\n"
+        "2️⃣ Study & focus\n"
+        "3️⃣ Stress relief\n"
+        "👇 Drop your number below!\n\n"
+        "Follow for 4 new sounds every day 🔔",
+    "forest":
+        "🌿 When do you listen to nature sounds?\n"
+        "1️⃣ While working\n"
+        "2️⃣ Before sleep\n"
+        "3️⃣ During meditation\n"
+        "👇 Comment your number!\n\n"
+        "Follow for daily relaxation sounds 🔔",
+    "ocean":
+        "🌊 Ocean waves help you...\n"
+        "1️⃣ Fall asleep faster\n"
+        "2️⃣ Focus & study\n"
+        "3️⃣ Reduce anxiety\n"
+        "👇 Which one is you?\n\n"
+        "Follow for 4 new sounds every day 🔔",
+    "fireplace":
+        "🔥 You're listening to this because...\n"
+        "1️⃣ Getting cozy tonight\n"
+        "2️⃣ Can't sleep\n"
+        "3️⃣ Just want to relax\n"
+        "👇 Tell me below!\n\n"
+        "Follow for daily relaxation sounds 🔔",
+    "meditation":
+        "🧘 How do you meditate?\n"
+        "1️⃣ With music or sound\n"
+        "2️⃣ In total silence\n"
+        "3️⃣ I'm just starting out\n"
+        "👇 Drop your number!\n\n"
+        "Follow for 4 new sounds every day 🔔",
+    "deep_sleep":
+        "🌙 What keeps you awake at night?\n"
+        "1️⃣ Anxiety & stress\n"
+        "2️⃣ Racing thoughts\n"
+        "3️⃣ Can't switch off\n"
+        "👇 You're not alone — comment below!\n\n"
+        "Follow for daily sleep sounds 🔔",
+    "white_noise":
+        "💤 White noise helps you...\n"
+        "1️⃣ Focus & study\n"
+        "2️⃣ Block out distractions\n"
+        "3️⃣ Fall asleep faster\n"
+        "👇 Which one?\n\n"
+        "Follow for 4 new sounds every day 🔔",
 }
 
 
