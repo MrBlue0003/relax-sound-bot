@@ -9,6 +9,7 @@
           "name": "Heavy Rain",
           "subtitle": "for Deep Sleep",
           "video_queries": ["heavy rain", "rain storm", "rain drops"],
+          "audio_file": "rain.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=180,lowpass=f=8000,volume=6.5",
           "tags": ["rain", "sleep", "ASMR", "white noise", "relaxing"]
         },
@@ -25,6 +26,7 @@
           "name": "Gentle Rain",
           "subtitle": "for Study & Focus",
           "video_queries": ["gentle rain", "light rain", "soft rain nature"],
+          "audio_file": "rain.mp3",
           "audio_lavfi": "anoisesrc=color=pink,highpass=f=600,lowpass=f=7000,volume=3.8",
           "tags": ["rain", "study", "focus", "calm", "relaxing"]
         },
@@ -33,6 +35,7 @@
           "name": "Rain on Window",
           "subtitle": "for Cozy Reading",
           "video_queries": ["rain on window", "rain glass window", "rainy day indoors"],
+          "audio_file": "rain.mp3",
           "audio_lavfi": "anoisesrc=color=white,highpass=f=1200,lowpass=f=6500,volume=3.2",
           "tags": ["rain", "cozy", "relax", "ASMR", "window"]
         },
@@ -41,6 +44,7 @@
           "name": "Tropical Rain",
           "subtitle": "for Relaxation",
           "video_queries": ["tropical rain forest", "jungle rain", "rainforest rain"],
+          "audio_file": "forest_rain.mp3",
           "audio_lavfi": "anoisesrc=color=pink,highpass=f=280,lowpass=f=10000,volume=5.8",
           "tags": ["rain", "tropical", "sleep", "nature", "jungle"]
         },
@@ -49,6 +53,7 @@
           "name": "Summer Rain",
           "subtitle": "for Sleep & Calm",
           "video_queries": ["summer rain", "warm rain", "rain garden nature"],
+          "audio_file": "rain.mp3",
           "audio_lavfi": "anoisesrc=color=pink,highpass=f=500,lowpass=f=8500,volume=4.2",
           "tags": ["rain", "sleep", "calm", "nature", "relaxing"]
         }
@@ -171,6 +176,7 @@
           "name": "Ocean Waves",
           "subtitle": "for Deep Sleep",
           "video_queries": ["ocean waves beach", "sea waves", "waves crashing shore"],
+          "audio_file": "ocean_waves.mp3",
           "audio_lavfi": "anoisesrc=color=brown,lowpass=f=500,volume=5.5",
           "tags": ["ocean", "waves", "sleep", "nature", "relaxing"]
         },
@@ -195,6 +201,7 @@
           "name": "Beach Waves",
           "subtitle": "for Relaxation",
           "video_queries": ["beach waves sunset", "calm beach ocean", "beach waves sand"],
+          "audio_file": "ocean_waves.mp3",
           "audio_lavfi": "anoisesrc=color=brown,lowpass=f=600,volume=5.0",
           "tags": ["beach", "waves", "ocean", "relax", "sleep"]
         },
@@ -225,6 +232,7 @@
           "name": "Forest Birds",
           "subtitle": "for Morning Energy",
           "video_queries": ["forest birds nature", "birds singing forest", "bird sounds trees"],
+          "audio_file": "forest_birds.mp3",
           "audio_lavfi": "anoisesrc=color=pink,highpass=f=800,lowpass=f=6000,volume=4.5",
           "tags": ["birds", "nature", "morning", "calm", "forest"]
         },
@@ -233,6 +241,7 @@
           "name": "Wind in Trees",
           "subtitle": "for Deep Relaxation",
           "video_queries": ["wind trees leaves", "wind forest", "autumn wind leaves"],
+          "audio_file": "wind_trees.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=150,lowpass=f=3000,volume=4.0",
           "tags": ["wind", "nature", "relax", "calm", "forest"]
         },
@@ -241,6 +250,7 @@
           "name": "Night Crickets",
           "subtitle": "for Sleep & Meditation",
           "video_queries": ["night crickets", "cricket sounds night", "summer night insects"],
+          "audio_file": "night_nature.mp3",
           "audio_lavfi": "anoisesrc=color=pink,highpass=f=1500,lowpass=f=5000,volume=4.5",
           "tags": ["night", "crickets", "sleep", "nature", "meditation"]
         },
@@ -249,6 +259,7 @@
           "name": "Morning Birds",
           "subtitle": "for a Fresh Start",
           "video_queries": ["birds chirping morning", "dawn chorus birds", "morning birds nature"],
+          "audio_file": "morning_birds.mp3",
           "audio_lavfi": "anoisesrc=color=pink,highpass=f=1000,lowpass=f=7000,volume=4.0",
           "tags": ["birds", "morning", "nature", "energy", "calm"]
         },
@@ -257,6 +268,7 @@
           "name": "Forest Rain",
           "subtitle": "for Relaxation",
           "video_queries": ["forest rain", "rain forest trees", "rainy forest nature"],
+          "audio_file": "forest_rain.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=300,lowpass=f=5000,volume=5.0",
           "tags": ["forest", "rain", "nature", "relax", "calm"]
         },
@@ -265,6 +277,7 @@
           "name": "Windy Forest",
           "subtitle": "for Calm & Peace",
           "video_queries": ["forest wind", "windy trees swaying", "trees in wind"],
+          "audio_file": "wind_trees.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=200,lowpass=f=4000,volume=4.0",
           "tags": ["wind", "forest", "calm", "nature", "relax"]
         }
