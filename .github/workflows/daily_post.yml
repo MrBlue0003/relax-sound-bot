@@ -4,7 +4,12 @@ on:
   schedule:
     # 4x/day: 06:00, 10:00, 14:00, 18:00 UTC = 09:00, 13:00, 17:00, 21:00 Bucharest (EEST)
     - cron: '0 6,10,14,18 * * *'
-  workflow_dispatch:   # allow manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      force_variant_id:
+        description: 'Force a specific variant ID (e.g. crackling_fire). Leave empty for auto rotation.'
+        required: false
+        default: ''
 
 jobs:
   post:
@@ -45,6 +50,7 @@ jobs:
           YOUTUBE_CHANNEL_ID:    ${{ secrets.YOUTUBE_CHANNEL_ID }}
           UPLOAD_TIMEZONE:       Europe/Bucharest
           VIDEO_DURATION:        120
+          FORCE_VARIANT_ID:      ${{ github.event.inputs.force_variant_id }}
         run: python main.py
 
       - name: Save upload log to repo

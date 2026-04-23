@@ -106,10 +106,10 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
                 duration: int = 90, audio_path: Path | None = None) -> Path:
     """
     Build a relaxation video.
-    - media_path .mp4 + audio_path: loop video visuals, use audio_path as sound
-    - media_path .mp4 (no audio_path): loop video with original audio (or noise if mute)
-    - media_path .jpg/.png + audio_path: image bg + audio_path
-    - media_path .jpg/.png (no audio_path): image bg + anoisesrc generated noise
+    - audio_path provided: always use that file as audio (looped), ignores video audio
+    - media_path .mp4 (no audio_path): use video's original audio if good, else lavfi
+    - media_path .jpg/.png + audio_path: image bg + audio_path looped
+    - media_path .jpg/.png (no audio_path): image bg + lavfi synthetic noise
     """
     font = FONT_PATH
     name_text = esc(theme["name"].upper())
@@ -142,7 +142,43 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     # Lavfi fallback — only used when video has no audio or media is image
     audio_lavfi = theme.get("audio_lavfi", "anoisesrc=color=brown,volume=4.0")
 
-    if is_video and _video_has_audio(media_path):
+    if audio_path and audio_path.exists():
+        # ── Real audio file provided — loop it to fill the duration ──
+        audio_str = str(audio_path.resolve()).replace("\\", "/")
+        logger.info(f"Using real audio file: {audio_path.name}")
+        if is_video:
+            ffmpeg_args = [
+                "ffmpeg", "-y",
+                "-stream_loop", "-1", "-i", media_str,
+                "-stream_loop", "-1", "-i", audio_str,
+                "-t", str(duration),
+                "-filter_complex",
+                f"[0:v]{vf}[vout];"
+                f"[1:a]atrim=duration={duration},volume=2.5,"
+                f"afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
+                "-map", "[vout]", "-map", "[aout]",
+                "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+                "-c:a", "aac", "-b:a", "128k",
+                "-movflags", "+faststart",
+                out_str,
+            ]
+        else:
+            ffmpeg_args = [
+                "ffmpeg", "-y",
+                "-loop", "1", "-i", media_str,
+                "-stream_loop", "-1", "-i", audio_str,
+                "-t", str(duration),
+                "-filter_complex",
+                f"[0:v]{vf}[vout];"
+                f"[1:a]atrim=duration={duration},volume=2.5,"
+                f"afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
+                "-map", "[vout]", "-map", "[aout]",
+                "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+                "-c:a", "aac", "-b:a", "128k",
+                "-movflags", "+faststart",
+                out_str,
+            ]
+    elif is_video and _video_has_audio(media_path):
         # ── Use original video audio — birds chirp, rain falls, waves crash ──
         logger.info("Using original video audio (matches visuals)")
         ffmpeg_args = [

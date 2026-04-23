@@ -114,6 +114,20 @@ def pick_variant() -> tuple[dict, int]:
     return candidate, slot_in_day
 
 
+def _find_variant_by_id(variant_id: str) -> tuple[dict, int]:
+    """Look up a variant by its id from sounds.json. Returns (variant, slot_in_day=0)."""
+    with open(config.SOUNDS_FILE, encoding="utf-8") as f:
+        data = json.load(f)
+    for cat in data["categories"]:
+        for v in cat["variants"]:
+            if v["id"] == variant_id:
+                entry = dict(v)
+                entry["category_id"] = cat["id"]
+                logger.info(f"Forced variant: {entry['name']} (category: {cat['label']})")
+                return entry, 0
+    raise ValueError(f"Variant ID not found in sounds.json: {variant_id!r}")
+
+
 def get_work_dir(timestamp: str) -> Path:
     if os.name == "nt":
         work_dir = Path(f"E:/temp/rs/{timestamp}")
@@ -137,7 +151,13 @@ def main() -> int:
         return 1
 
     try:
-        variant, slot_in_day = pick_variant()
+        # Allow workflow_dispatch to force a specific variant
+        force_id = os.getenv("FORCE_VARIANT_ID", "").strip()
+        if force_id:
+            logger.info(f"FORCE_VARIANT_ID={force_id} — bypassing rotation")
+            variant, slot_in_day = _find_variant_by_id(force_id)
+        else:
+            variant, slot_in_day = pick_variant()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         work_dir = get_work_dir(timestamp)
 
@@ -165,9 +185,21 @@ def main() -> int:
             logger.error(f"Could not download any media for: {variant['name']}")
             return 1
 
+        # Resolve optional real audio file (overrides lavfi + video audio)
+        audio_path = None
+        audio_file = variant.get("audio_file")
+        if audio_file:
+            audio_path = config.ASSETS_DIR / audio_file
+            if audio_path.exists():
+                logger.info(f"Audio file override: {audio_path.name}")
+            else:
+                logger.warning(f"audio_file not found: {audio_path} — using lavfi fallback")
+                audio_path = None
+
         safe_name = variant["name"].lower().replace(" ", "_")
         output_path = work_dir / f"relax_{timestamp}_{safe_name}.mp4"
-        build_video(variant, media_path, output_path, duration=config.VIDEO_DURATION)
+        build_video(variant, media_path, output_path, duration=config.VIDEO_DURATION,
+                    audio_path=audio_path)
 
         video_id = upload_video(output_path, variant)
 

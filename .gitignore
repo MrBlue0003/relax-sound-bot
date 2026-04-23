@@ -1,6 +1,8 @@
 .env
 client_secrets.json
-assets/
+assets/*.jpg
+assets/*.png
+assets/*.mp4
 output/
 logs/*.log
 __pycache__/

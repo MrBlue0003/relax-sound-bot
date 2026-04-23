@@ -279,6 +279,7 @@
           "name": "Crackling Fireplace",
           "subtitle": "for Cozy Relaxation",
           "video_queries": ["fireplace crackling fire", "cozy fireplace", "fire burning logs"],
+          "audio_file": "crackling_fire.mp3",
           "audio_lavfi": "anoisesrc=color=pink,lowpass=f=2000,highpass=f=80,volume=5.0",
           "tags": ["fireplace", "cozy", "relax", "ASMR", "fire"]
         },
@@ -287,6 +288,7 @@
           "name": "Campfire Night",
           "subtitle": "for Deep Sleep",
           "video_queries": ["campfire night", "outdoor bonfire", "campfire stars"],
+          "audio_file": "crackling_fire.mp3",
           "audio_lavfi": "anoisesrc=color=pink,lowpass=f=2500,highpass=f=100,volume=4.5",
           "tags": ["campfire", "fire", "sleep", "nature", "ASMR"]
         },
@@ -295,6 +297,7 @@
           "name": "Fireplace & Rain",
           "subtitle": "for Ultimate Comfort",
           "video_queries": ["indoor fire rain", "cozy fire rainy", "fireplace rain window"],
+          "audio_file": "crackling_fire.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=150,lowpass=f=3000,volume=4.5",
           "tags": ["fireplace", "rain", "cozy", "comfort", "relax"]
         },
@@ -303,6 +306,7 @@
           "name": "Wood Burning Fire",
           "subtitle": "for Stress Relief",
           "video_queries": ["wood fire burning", "log fire", "burning wood fireplace"],
+          "audio_file": "crackling_fire.mp3",
           "audio_lavfi": "anoisesrc=color=pink,lowpass=f=1800,highpass=f=60,volume=5.0",
           "tags": ["fire", "wood", "stress relief", "ASMR", "relax"]
         },
@@ -311,6 +315,7 @@
           "name": "Cozy Winter Fire",
           "subtitle": "for Cozy Evenings",
           "video_queries": ["winter fireplace cozy", "christmas fireplace", "snowy cabin fire"],
+          "audio_file": "crackling_fire.mp3",
           "audio_lavfi": "anoisesrc=color=pink,lowpass=f=2200,highpass=f=90,volume=4.8",
           "tags": ["fireplace", "winter", "cozy", "christmas", "relax"]
         },
@@ -319,6 +324,7 @@
           "name": "Candles & Silence",
           "subtitle": "for Meditation",
           "video_queries": ["candle flame burning", "candles flickering", "candlelight dark"],
+          "audio_file": "crackling_fire.mp3",
           "audio_lavfi": "anoisesrc=color=pink,lowpass=f=1500,highpass=f=70,volume=3.5",
           "tags": ["candle", "meditation", "calm", "peace", "ASMR"]
         }
