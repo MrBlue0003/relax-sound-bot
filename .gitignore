@@ -9,3 +9,4 @@ __pycache__/
 *.pyc
 *.tmp
 !logs/uploaded.json
+!logs/uploaded_long.json

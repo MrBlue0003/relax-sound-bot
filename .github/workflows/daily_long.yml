@@ -1,0 +1,71 @@
+name: Relax Sound Long Video
+
+on:
+  schedule:
+    # Once per day at 12:00 UTC = 15:00 Bucharest (EEST)
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+    inputs:
+      force_long_variant_id:
+        description: 'Force a specific long variant ID (e.g. rain_sleep_1h). Leave empty for auto rotation.'
+        required: false
+        default: ''
+
+jobs:
+  post_long:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90   # 1h encode + upload; free runner ~8× realtime at ultrafast
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 1
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-liberation
+          ffmpeg -version | head -1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create required directories
+        run: mkdir -p logs assets/music assets/images output
+
+      - name: Run long video bot
+        env:
+          PIXABAY_API_KEY:       ${{ secrets.PIXABAY_API_KEY }}
+          YOUTUBE_CLIENT_ID:     ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YOUTUBE_CHANNEL_ID:    ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          UPLOAD_TIMEZONE:       Europe/Bucharest
+          FORCE_LONG_VARIANT_ID: ${{ github.event.inputs.force_long_variant_id }}
+        run: python main_long.py
+
+      - name: Save upload log
+        if: always()
+        run: |
+          git config user.email "relax-sound-bot@github.com"
+          git config user.name "Relax Sound Bot"
+          git add logs/uploaded_long.json || true
+          git diff --staged --quiet || git commit -m "chore: update long video upload log [skip ci]"
+          git pull --rebase origin main
+          git push
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: long-bot-logs-${{ github.run_id }}
+          path: logs/
+          retention-days: 7

@@ -1,0 +1,158 @@
+{
+  "long_videos": [
+    {
+      "id": "rain_sleep_1h",
+      "category": "rain",
+      "duration_hours": 1,
+      "title": "1 Hour of Rain Sounds for Deep Sleep",
+      "subtitle": "Soft rainfall to help you drift off into restful sleep",
+      "audio_file": "rain.mp3",
+      "video_queries": ["rain window drops", "rainfall nature", "rain drops slow"],
+      "image_queries": ["rain window", "rainfall", "rain drops"],
+      "tags": ["rain sounds", "sleep sounds", "1 hour rain", "rain for sleeping", "rain sleep", "rain asmr", "sleep aid"]
+    },
+    {
+      "id": "rain_focus_1h",
+      "category": "rain",
+      "duration_hours": 1,
+      "title": "1 Hour of Rain Sounds for Study & Focus",
+      "subtitle": "Steady rainfall to boost concentration and productivity",
+      "audio_file": "rain.mp3",
+      "video_queries": ["rain window office", "rain drops glass", "rainfall forest"],
+      "image_queries": ["rain study", "rain window", "rain drops glass"],
+      "tags": ["rain sounds", "study sounds", "1 hour rain", "focus music", "rain study", "concentration", "productivity"]
+    },
+    {
+      "id": "rain_relax_1h",
+      "category": "rain",
+      "duration_hours": 1,
+      "title": "1 Hour of Gentle Rain for Relaxation & Stress Relief",
+      "subtitle": "Let the calming sound of rain wash away your stress",
+      "audio_file": "rain.mp3",
+      "video_queries": ["gentle rain nature", "rain garden", "rain leaves"],
+      "image_queries": ["rain garden", "gentle rain", "rain forest"],
+      "tags": ["rain sounds", "relaxation", "1 hour rain", "stress relief", "gentle rain", "calming", "anxiety relief"]
+    },
+    {
+      "id": "forest_rain_1h",
+      "category": "rain",
+      "duration_hours": 1,
+      "title": "1 Hour of Rain in the Forest — Nature Sounds for Sleep",
+      "subtitle": "Raindrops on leaves in a peaceful woodland",
+      "audio_file": "forest_rain.mp3",
+      "video_queries": ["rain forest trees", "forest rain drops", "woodland rain"],
+      "image_queries": ["forest rain", "rain in forest", "woodland rain"],
+      "tags": ["forest rain", "rain sounds", "nature sounds", "1 hour", "forest sleep", "woodland sounds", "rain forest"]
+    },
+    {
+      "id": "forest_birds_1h",
+      "category": "forest",
+      "duration_hours": 1,
+      "title": "1 Hour of Forest Birds — Morning Nature Sounds",
+      "subtitle": "Wake up gently to the symphony of birds in the forest",
+      "audio_file": "forest_birds.mp3",
+      "video_queries": ["forest birds trees", "woodland morning", "birds forest green"],
+      "image_queries": ["forest morning", "birds in trees", "woodland birds"],
+      "tags": ["forest birds", "bird sounds", "nature sounds", "1 hour birds", "morning birds", "bird songs", "forest sounds"]
+    },
+    {
+      "id": "morning_birds_1h",
+      "category": "forest",
+      "duration_hours": 1,
+      "title": "1 Hour of Morning Birds for Peaceful Awakening",
+      "subtitle": "Gentle birdsong to start your day with calm and clarity",
+      "audio_file": "morning_birds.mp3",
+      "video_queries": ["morning sunrise birds", "dawn forest light", "sunrise nature"],
+      "image_queries": ["sunrise morning", "dawn birds", "morning forest light"],
+      "tags": ["morning birds", "bird sounds", "nature sounds", "1 hour", "morning routine", "peaceful morning", "bird songs"]
+    },
+    {
+      "id": "wind_trees_1h",
+      "category": "forest",
+      "duration_hours": 1,
+      "title": "1 Hour of Wind Through the Trees — Relaxing Nature Sounds",
+      "subtitle": "The soothing sound of a gentle breeze rustling through leaves",
+      "audio_file": "wind_trees.mp3",
+      "video_queries": ["wind trees swaying", "forest breeze leaves", "wind nature trees"],
+      "image_queries": ["wind trees", "breeze forest", "swaying trees"],
+      "tags": ["wind sounds", "nature sounds", "1 hour", "wind trees", "forest sounds", "breeze sounds", "relaxing nature"]
+    },
+    {
+      "id": "night_crickets_1h",
+      "category": "forest",
+      "duration_hours": 1,
+      "title": "1 Hour of Night Crickets — Peaceful Evening Ambience",
+      "subtitle": "Crickets and frogs under a summer night sky",
+      "audio_file": "night_nature.mp3",
+      "video_queries": ["night forest stars", "summer night nature", "crickets grass night"],
+      "image_queries": ["night nature stars", "summer night", "moonlight forest"],
+      "tags": ["cricket sounds", "night sounds", "nature sounds", "1 hour", "evening sounds", "frogs crickets", "sleep night"]
+    },
+    {
+      "id": "ocean_sleep_1h",
+      "category": "ocean",
+      "duration_hours": 1,
+      "title": "1 Hour of Ocean Waves for Deep Sleep",
+      "subtitle": "Rhythmic waves rolling onto shore to carry you to sleep",
+      "audio_file": "ocean_waves.mp3",
+      "video_queries": ["ocean waves beach", "sea waves shore", "ocean sunset"],
+      "image_queries": ["ocean waves", "beach waves", "sea shore"],
+      "tags": ["ocean sounds", "wave sounds", "1 hour ocean", "sleep sounds", "beach sounds", "ocean waves", "sea sounds"]
+    },
+    {
+      "id": "beach_waves_1h",
+      "category": "ocean",
+      "duration_hours": 1,
+      "title": "1 Hour of Beach Waves — Tropical Relaxation Sounds",
+      "subtitle": "Tropical beach sounds to transport you to paradise",
+      "audio_file": "ocean_waves.mp3",
+      "video_queries": ["tropical beach waves", "beach shore calm", "ocean tropical"],
+      "image_queries": ["tropical beach", "paradise waves", "beach relax"],
+      "tags": ["beach sounds", "wave sounds", "1 hour beach", "tropical sounds", "ocean relaxation", "beach waves", "paradise"]
+    },
+    {
+      "id": "ocean_meditation_1h",
+      "category": "ocean",
+      "duration_hours": 1,
+      "title": "1 Hour of Ocean Sounds for Meditation & Yoga",
+      "subtitle": "Let the ocean guide you into a state of deep calm",
+      "audio_file": "ocean_waves.mp3",
+      "video_queries": ["ocean meditation calm", "sea sunrise peaceful", "ocean waves slow"],
+      "image_queries": ["ocean meditation", "sea calm", "peaceful ocean"],
+      "tags": ["ocean sounds", "meditation sounds", "1 hour", "yoga sounds", "ocean meditation", "sea meditation", "mindfulness"]
+    },
+    {
+      "id": "fireplace_cozy_1h",
+      "category": "fireplace",
+      "duration_hours": 1,
+      "title": "1 Hour of Crackling Fireplace — Cozy Winter Sounds",
+      "subtitle": "Warm and crackling fire for your coziest moments",
+      "audio_file": "crackling_fire.mp3",
+      "video_queries": ["fireplace crackling", "cozy fireplace winter", "wood fire burning"],
+      "image_queries": ["fireplace cozy", "crackling fire", "wood fire warm"],
+      "tags": ["fireplace sounds", "crackling fire", "1 hour fireplace", "cozy sounds", "winter sounds", "fire asmr", "hygge"]
+    },
+    {
+      "id": "campfire_1h",
+      "category": "fireplace",
+      "duration_hours": 1,
+      "title": "1 Hour of Campfire Sounds — Outdoor Night Ambience",
+      "subtitle": "Sit by the campfire under a starry sky",
+      "audio_file": "crackling_fire.mp3",
+      "video_queries": ["campfire night outdoor", "bonfire nature night", "campfire stars"],
+      "image_queries": ["campfire night", "bonfire outdoor", "campfire stars"],
+      "tags": ["campfire sounds", "fire sounds", "1 hour", "outdoor sounds", "night sounds", "bonfire", "camping sounds"]
+    },
+    {
+      "id": "fireplace_rain_1h",
+      "category": "fireplace",
+      "duration_hours": 1,
+      "title": "1 Hour of Fireplace & Rain — Ultimate Cozy Sounds",
+      "subtitle": "Rain outside, warm fire inside — pure comfort",
+      "audio_file": "forest_rain.mp3",
+      "video_queries": ["fireplace rainy night", "cozy fire rain window", "fireplace warm winter"],
+      "image_queries": ["cozy fireplace rain", "fire rain window", "winter fireplace rain"],
+      "tags": ["fireplace rain", "cozy sounds", "1 hour", "rain and fire", "winter sounds", "cozy vibes", "sleep sounds"]
+    }
+  ]
+}
