@@ -1,4 +1,12 @@
-"""assemble.py — Build a 90-second relaxation short with text overlay."""
+"""assemble.py — Build a 120-second relaxation Short with rich overlay.
+
+Visual design:
+  • Hook text for first 3s  — grabs the 2-second algorithm retention check
+  • Category-coloured accent — visual brand identity per sound type
+  • Fake bottom gradient    — readability without covering the scenery
+  • Animated progress bar   — keeps viewers watching to the end
+  • Loop badge              — sets expectation, reduces drop-off
+"""
 import logging
 import platform
 import subprocess
@@ -6,8 +14,32 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-WIDTH = 1080
+WIDTH  = 1080
 HEIGHT = 1920
+
+# ── Per-category accent colours (ffmpeg 0xRRGGBB) ────────────────────────────
+CAT_COLORS = {
+    "rain":       "0x2255BB",   # deep blue
+    "forest":     "0x1A7A22",   # forest green
+    "ocean":      "0x006688",   # teal
+    "fireplace":  "0xBB4400",   # ember orange
+    "meditation": "0x6633AA",   # purple
+    "deep_sleep": "0x1A1A66",   # midnight blue
+    "white_noise":"0x445566",   # slate
+}
+_CAT_COLOR_DEFAULT = "0x222233"
+
+# ── Per-category hook lines (shown for first 3 s) ─────────────────────────────
+CAT_HOOKS = {
+    "rain":       "Close your eyes...",
+    "forest":     "Breathe in nature",
+    "ocean":      "Feel the waves...",
+    "fireplace":  "Get cozy tonight",
+    "meditation": "Clear your mind",
+    "deep_sleep": "Time to sleep...",
+    "white_noise":"Find your focus",
+}
+_HOOK_DEFAULT = "Relax and unwind..."
 
 
 def _detect_font() -> str:
@@ -29,17 +61,17 @@ FONT_PATH = _detect_font()
 
 
 def esc(s: str) -> str:
-    """Escape text for ffmpeg drawtext filter."""
+    """Escape text for ffmpeg drawtext."""
     return (s.replace("\\", "\\\\")
-             .replace("'", "\u2019")
-             .replace('"', "\u201c")
-             .replace(":", "\\:")
-             .replace("[", "\\[")
-             .replace("]", "\\]")
-             .replace(",", " ")
-             .replace(";", " ")
-             .replace("%", "%%")
-             .replace("$", "\\$")
+             .replace("'",  "\u2019")   # curly apostrophe — safe in filter
+             .replace('"',  "\u201c")
+             .replace(":",  "\\:")
+             .replace("[",  "\\[")
+             .replace("]",  "\\]")
+             .replace(",",  " ")
+             .replace(";",  " ")
+             .replace("%",  "%%")
+             .replace("$",  "\\$")
              .replace("\n", " "))
 
 
@@ -60,11 +92,8 @@ def _run_ffmpeg(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
 
 
 def _video_has_audio(video_path: Path) -> bool:
-    """Return True if video has an audio stream with actual non-silent content.
-    Checks both stream existence AND that mean volume is above -91 dBFS (not silence).
-    """
+    """Return True if video has a real, non-silent audio stream."""
     try:
-        # Step 1: check if audio stream exists
         r = subprocess.run(
             ["ffprobe", "-v", "quiet", "-select_streams", "a:0",
              "-show_entries", "stream=codec_type", "-of", "csv=p=0",
@@ -73,131 +102,175 @@ def _video_has_audio(video_path: Path) -> bool:
         )
         if "audio" not in r.stdout:
             return False
-
-        # Step 2: measure actual volume — detect silent streams
         r2 = subprocess.run(
             ["ffmpeg", "-i", str(video_path),
-             "-t", "10",  # sample first 10 seconds
-             "-af", "volumedetect",
-             "-f", "null", "-"],
+             "-t", "10", "-af", "volumedetect", "-f", "null", "-"],
             capture_output=True, text=True, timeout=30,
         )
-        output = r2.stderr
-        # Look for mean_volume line
-        for line in output.splitlines():
+        for line in r2.stderr.splitlines():
             if "mean_volume" in line:
-                # e.g. "mean_volume: -91.0 dB" means silence
                 try:
                     db = float(line.split(":")[1].strip().replace(" dB", ""))
                     if db < -90.0:
-                        logger.info(f"Audio stream detected but silent (mean={db:.1f}dB) — using lavfi fallback")
+                        logger.info(f"Audio silent ({db:.1f}dB) — using fallback")
                         return False
-                    logger.info(f"Audio stream OK (mean={db:.1f}dB)")
                     return True
                 except Exception:
                     pass
-        # If volumedetect didn't output mean_volume, assume audio is OK
         return True
     except Exception:
         return False
 
 
+def _build_vf(theme: dict, duration: int) -> str:
+    """
+    Build the full ffmpeg -vf filter chain.
+
+    Layout (1080×1920):
+      y=0–180   : HOOK TEXT — category colour box, big text, 3 s then gone
+      y=180–1500: clean ambient video (no overlays)
+      y=1500–1920: bottom zone
+          1500–1920: fake gradient (3 dark layers)
+          1500–1920: 10-px left accent stripe
+          1560     : NAME   (fontsize 84, white, bold)
+          1700     : subtitle (fontsize 42, white 92%)
+          1860–1868: progress bar track (dark)
+          1860–1868: progress bar fill (animated, category colour)
+          1876     : "LOOP" badge text
+    """
+    font  = FONT_PATH
+    cat   = theme.get("category_id", "")
+    color = CAT_COLORS.get(cat, _CAT_COLOR_DEFAULT)
+    hook  = esc(theme.get("hook", CAT_HOOKS.get(cat, _HOOK_DEFAULT)))
+    name  = esc(theme["name"].upper())
+    sub   = esc(theme["subtitle"])
+
+    filters = [
+        # ── Canvas ──────────────────────────────────────────────────────────
+        f"scale={WIDTH}:{HEIGHT}:force_original_aspect_ratio=increase",
+        f"crop={WIDTH}:{HEIGHT}",
+        "setsar=1",
+
+        # ── Hook banner (0–3 s) ──────────────────────────────────────────────
+        f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.90:t=fill"
+        f":enable='between(t,0,3)'",
+        # Thin bottom accent on hook box
+        f"drawbox=x=0:y=188:w={WIDTH}:h=7:color={color}:t=fill"
+        f":enable='between(t,0,3)'",
+        f"drawtext=fontfile='{font}':text='{hook}'"
+        f":fontsize=74:fontcolor=white:x=(w-text_w)/2:y=62"
+        f":borderw=3:bordercolor=black@0.55"
+        f":enable='between(t,0,3)'",
+
+        # ── Bottom gradient (3 overlapping semi-transparent layers) ─────────
+        f"drawbox=x=0:y=1480:w={WIDTH}:h=440:color=black@0.28:t=fill",
+        f"drawbox=x=0:y=1610:w={WIDTH}:h=310:color=black@0.52:t=fill",
+        f"drawbox=x=0:y=1740:w={WIDTH}:h=180:color=black@0.78:t=fill",
+
+        # ── Left category accent stripe ──────────────────────────────────────
+        f"drawbox=x=0:y=1480:w=10:h=440:color={color}:t=fill",
+
+        # ── Sound name ───────────────────────────────────────────────────────
+        f"drawtext=fontfile='{font}':text='{name}'"
+        f":fontsize=84:fontcolor=white:x=(w-text_w)/2:y=1555"
+        f":borderw=3:bordercolor={color}@0.40",
+
+        # ── Subtitle ─────────────────────────────────────────────────────────
+        f"drawtext=fontfile='{font}':text='{sub}'"
+        f":fontsize=42:fontcolor=white@0.93:x=(w-text_w)/2:y=1692"
+        f":borderw=2:bordercolor=black@0.70",
+
+        # ── Progress bar track (full width, dark) ────────────────────────────
+        f"drawbox=x=0:y=1855:w={WIDTH}:h=9:color=0x111111@0.85:t=fill",
+        # Progress bar fill — w grows with time (w=frame_width, t=time, t=fill=thickness mode)
+        f"drawbox=x=0:y=1855:w=w*t/{duration}:h=9:color={color}:t=fill",
+
+        # ── Loop badge ────────────────────────────────────────────────────────
+        f"drawtext=fontfile='{font}':text='LOOP'"
+        f":fontsize=28:fontcolor=white@0.60:x=(w-text_w)/2:y=1873",
+    ]
+
+    return ",".join(filters)
+
+
 def build_video(theme: dict, media_path: Path, output_path: Path,
-                duration: int = 90, audio_path: Path | None = None) -> Path:
+                duration: int = 120, audio_path: Path | None = None) -> Path:
     """
-    Build a relaxation video.
-    - audio_path provided: always use that file as audio (looped), ignores video audio
-    - media_path .mp4 (no audio_path): use video's original audio if good, else lavfi
-    - media_path .jpg/.png + audio_path: image bg + audio_path looped
-    - media_path .jpg/.png (no audio_path): image bg + lavfi synthetic noise
+    Build a relaxation Short video.
+
+    Audio priority:
+      1. audio_path file provided → loop that file (real birds/rain/etc.)
+      2. video with non-silent audio → use original video audio
+      3. video without audio / image → lavfi synthetic fallback
+
+    Args:
+        theme:       Variant dict (name, subtitle, category_id, audio_lavfi, …)
+        media_path:  Source video (.mp4) or image (.jpg/.png)
+        output_path: Destination .mp4
+        duration:    Seconds (default 120)
+        audio_path:  Optional real audio file to loop
     """
-    font = FONT_PATH
-    name_text = esc(theme["name"].upper())
-    subtitle_text = esc(theme["subtitle"].upper())
-
-    top_box_y = 60
-    top_box_h = 200
-    name_y = top_box_y + 30
-    bot_box_y = HEIGHT - 155
-    bot_box_h = 130
-    sub_y = bot_box_y + 32
-
-    vf = (
-        f"scale={WIDTH}:{HEIGHT}:force_original_aspect_ratio=increase,"
-        f"crop={WIDTH}:{HEIGHT},"
-        f"drawbox=x=0:y={top_box_y}:w={WIDTH}:h={top_box_h}:color=black@0.72:t=fill,"
-        f"drawtext=fontfile='{font}':text='{name_text}':"
-        f"fontcolor=white:fontsize=82:x=(w-text_w)/2:y={name_y}:"
-        f"borderw=4:bordercolor=black@0.8,"
-        f"drawbox=x=0:y={bot_box_y}:w={WIDTH}:h={bot_box_h}:color=black@0.65:t=fill,"
-        f"drawtext=fontfile='{font}':text='{subtitle_text}':"
-        f"fontcolor=white@0.95:fontsize=44:x=(w-text_w)/2:y={sub_y}:"
-        f"borderw=2:bordercolor=black"
-    )
-
+    vf       = _build_vf(theme, duration)
     is_video = media_path.suffix.lower() == ".mp4"
     media_str = str(media_path.resolve()).replace("\\", "/")
-    out_str = str(output_path.resolve()).replace("\\", "/")
+    out_str   = str(output_path.resolve()).replace("\\", "/")
 
-    # Lavfi fallback — only used when video has no audio or media is image
+    # Lavfi fallback (used only when no real audio is available)
     audio_lavfi = theme.get("audio_lavfi", "anoisesrc=color=brown,volume=4.0")
 
+    # Common encode settings — ultrafast keeps GH Actions well under 30 min
+    encode = [
+        "-c:v", "libx264", "-preset", "ultrafast", "-crf", "23",
+        "-c:a", "aac", "-b:a", "128k",
+        "-movflags", "+faststart",
+    ]
+
     if audio_path and audio_path.exists():
-        # ── Real audio file provided — loop it to fill the duration ──
+        # ── Case 1: real audio file (birds, rain, fire…) ─────────────────────
         audio_str = str(audio_path.resolve()).replace("\\", "/")
-        logger.info(f"Using real audio file: {audio_path.name}")
-        if is_video:
-            ffmpeg_args = [
-                "ffmpeg", "-y",
-                "-stream_loop", "-1", "-i", media_str,
-                "-stream_loop", "-1", "-i", audio_str,
-                "-t", str(duration),
-                "-filter_complex",
-                f"[0:v]{vf}[vout];"
-                f"[1:a]atrim=duration={duration},volume=2.5,"
-                f"afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
-                "-map", "[vout]", "-map", "[aout]",
-                "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-                "-c:a", "aac", "-b:a", "128k",
-                "-movflags", "+faststart",
-                out_str,
-            ]
-        else:
-            ffmpeg_args = [
-                "ffmpeg", "-y",
-                "-loop", "1", "-i", media_str,
-                "-stream_loop", "-1", "-i", audio_str,
-                "-t", str(duration),
-                "-filter_complex",
-                f"[0:v]{vf}[vout];"
-                f"[1:a]atrim=duration={duration},volume=2.5,"
-                f"afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
-                "-map", "[vout]", "-map", "[aout]",
-                "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-                "-c:a", "aac", "-b:a", "128k",
-                "-movflags", "+faststart",
-                out_str,
-            ]
+        logger.info(f"Using real audio: {audio_path.name}")
+        input_args = (
+            ["-stream_loop", "-1", "-i", media_str] if is_video
+            else ["-loop", "1", "-i", media_str]
+        )
+        ffmpeg_args = [
+            "ffmpeg", "-y",
+            *input_args,
+            "-stream_loop", "-1", "-i", audio_str,
+            "-t", str(duration),
+            "-filter_complex",
+            f"[0:v]{vf}[vout];"
+            f"[1:a]atrim=duration={duration},"
+            f"volume=2.5,"
+            f"afade=t=in:st=0:d=2,"
+            f"afade=t=out:st={duration - 3}:d=3[aout]",
+            "-map", "[vout]", "-map", "[aout]",
+            *encode,
+            out_str,
+        ]
+
     elif is_video and _video_has_audio(media_path):
-        # ── Use original video audio — birds chirp, rain falls, waves crash ──
-        logger.info("Using original video audio (matches visuals)")
+        # ── Case 2: video has usable original audio ───────────────────────────
+        logger.info("Using video's own audio")
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-stream_loop", "-1", "-i", media_str,
             "-t", str(duration),
             "-filter_complex",
             f"[0:v]{vf}[vout];"
-            f"[0:a]aloop=loop=-1:size=2e+09,atrim=duration={duration},"
-            f"volume=2.5,afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
+            f"[0:a]aloop=loop=-1:size=2e+09,"
+            f"atrim=duration={duration},"
+            f"volume=2.5,"
+            f"afade=t=in:st=0:d=2,"
+            f"afade=t=out:st={duration - 3}:d=3[aout]",
             "-map", "[vout]", "-map", "[aout]",
-            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-            "-c:a", "aac", "-b:a", "128k",
-            "-movflags", "+faststart",
+            *encode,
             out_str,
         ]
+
     elif is_video:
-        # ── Video has no audio → synthetic fallback ──
-        logger.info("Video mute — using synthetic lavfi audio")
+        # ── Case 3: video but mute → lavfi ───────────────────────────────────
+        logger.info("Video mute — lavfi fallback")
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-stream_loop", "-1", "-i", media_str,
@@ -205,16 +278,16 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
             "-t", str(duration),
             "-filter_complex",
             f"[0:v]{vf}[vout];"
-            f"[1:a]afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
+            f"[1:a]afade=t=in:st=0:d=2,"
+            f"afade=t=out:st={duration - 3}:d=3[aout]",
             "-map", "[vout]", "-map", "[aout]",
-            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-            "-c:a", "aac", "-b:a", "128k",
-            "-movflags", "+faststart",
+            *encode,
             out_str,
         ]
+
     else:
-        # ── Image + synthetic audio ──
-        logger.info("Image input — using synthetic lavfi audio")
+        # ── Case 4: still image + lavfi ──────────────────────────────────────
+        logger.info("Image + lavfi fallback")
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-loop", "1", "-i", media_str,
@@ -222,22 +295,21 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
             "-t", str(duration),
             "-filter_complex",
             f"[0:v]{vf}[vout];"
-            f"[1:a]afade=t=in:st=0:d=2,afade=t=out:st={duration-3}:d=3[aout]",
+            f"[1:a]afade=t=in:st=0:d=2,"
+            f"afade=t=out:st={duration - 3}:d=3[aout]",
             "-map", "[vout]", "-map", "[aout]",
-            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-            "-c:a", "aac", "-b:a", "128k",
+            *encode,
             "-shortest",
-            "-movflags", "+faststart",
             out_str,
         ]
 
-    logger.info(f"Building video: {theme['name']} ({duration}s)")
+    logger.info(f"Building: {theme['name']} ({duration}s)")
     result = _run_ffmpeg(ffmpeg_args, output_path.parent)
 
     if result.returncode != 0:
-        logger.error(f"FFmpeg error:\n{result.stderr[-1000:]}")
-        raise RuntimeError(f"Video build failed for theme: {theme['name']}")
+        logger.error(f"ffmpeg error:\n{result.stderr[-2000:]}")
+        raise RuntimeError(f"Video build failed: {theme['name']}")
 
     size_mb = output_path.stat().st_size / 1024 / 1024
-    logger.info(f"Video done: {output_path.name} ({size_mb:.1f}MB)")
+    logger.info(f"Done: {output_path.name} ({size_mb:.1f} MB)")
     return output_path

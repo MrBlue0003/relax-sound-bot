@@ -136,15 +136,40 @@ _UNIVERSAL_HASHTAGS = (
 )
 
 
+# ── Per-category title emoji ──────────────────────────────────────────────────
+_CAT_EMOJI = {
+    "rain":       "🌧️",
+    "forest":     "🌿",
+    "ocean":      "🌊",
+    "fireplace":  "🔥",
+    "meditation": "🧘",
+    "deep_sleep": "🌙",
+    "white_noise":"💤",
+}
+
+# ── Hook phrases for description (matches assemble.py hooks) ─────────────────
+_CAT_DESC_HOOKS = {
+    "rain":       "Close your eyes and let the rain wash away your stress.",
+    "forest":     "Breathe in the peaceful sounds of nature.",
+    "ocean":      "Let the waves carry you to a place of calm.",
+    "fireplace":  "Get cozy and let the fire warm your soul.",
+    "meditation": "Clear your mind and find your inner peace.",
+    "deep_sleep": "Drift off into deep, restful sleep.",
+    "white_noise":"Find your focus and block out distractions.",
+}
+
+
 def upload_video(video_path: Path, variant: dict) -> str:
     """Upload video to YouTube. Returns video_id."""
     if not video_path.exists():
         raise FileNotFoundError(f"Video not found: {video_path}")
 
-    name = variant["name"]
-    subtitle = variant["subtitle"]
-    tags_base = variant.get("tags", [])
+    name        = variant["name"]
+    subtitle    = variant["subtitle"]
+    tags_base   = variant.get("tags", [])
     category_id = variant.get("category_id", "")
+    emoji       = _CAT_EMOJI.get(category_id, "🎵")
+    hook_line   = _CAT_DESC_HOOKS.get(category_id, "Relax and unwind.")
 
     # Build thematic tags list (deduplicated)
     all_tags = list(dict.fromkeys(
@@ -156,9 +181,10 @@ def upload_video(video_path: Path, variant: dict) -> str:
         ]
     ))
 
-    title = f"{name} \u2022 {subtitle} #Shorts"
+    # Title: emoji + name + subtitle — keep under 100 chars
+    title = f"{emoji} {name} • {subtitle} #Shorts"
     if len(title) > 100:
-        title = title[:97] + "\u2026"
+        title = title[:97] + "…"
 
     # Category-specific hashtags + variant tags + universal viral
     cat_tags = _CATEGORY_HASHTAGS.get(category_id, "")
@@ -166,13 +192,13 @@ def upload_video(video_path: Path, variant: dict) -> str:
     hashtags = f"{_UNIVERSAL_HASHTAGS}\n{cat_tags}\n{variant_hashtags}"
 
     description = (
-        f"\U0001f3b5 {name}\n"
-        f"{subtitle}\n\n"
-        f"\U0001f50a Turn on sound for the full experience!\n"
-        f"\U0001f33f Subscribe for daily relaxation sounds \U0001f514\n"
-        f"\U0001f514 New videos 3x per day — every day!\n\n"
-        f"---\n"
+        f"{emoji} {name}\n"
+        f"{hook_line}\n\n"
+        f"🔊 Turn on sound for the full experience!\n"
+        f"🌿 Subscribe for daily relaxation sounds 🔔\n"
+        f"🆕 4 new videos every day!\n\n"
         f"Perfect for: sleep, study, meditation, yoga, focus, stress relief & relaxation.\n\n"
+        f"---\n"
         f"{hashtags}"
     )
 

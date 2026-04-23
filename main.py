@@ -53,8 +53,8 @@ logger = logging.getLogger("main")
 
 def pick_variant() -> tuple[dict, int]:
     """Pick next variant using 7-category weekly rotation.
-    Returns (variant, slot_in_day) where slot_in_day is 0/1/2.
-    Never repeats a variant that appeared in the last 21 uploads.
+    Returns (variant, slot_in_day) where slot_in_day is 0/1/2/3.
+    Never repeats a variant that appeared in the last 28 uploads.
     """
     with open(config.SOUNDS_FILE, encoding="utf-8") as f:
         data = json.load(f)
@@ -67,17 +67,17 @@ def pick_variant() -> tuple[dict, int]:
             log = json.load(f)
         uploads = log.get("uploads", [])
         upload_count = len(uploads)
-        # Collect variant_ids from last 21 posts (full week cycle)
+        # Collect variant_ids from last 28 posts (full week cycle at 4/day)
         recent_variants = {
-            u["variant_id"] for u in uploads[-21:]
+            u["variant_id"] for u in uploads[-28:]
             if u.get("variant_id")
         }
 
-    # 21 slots per week (7 days × 3 posts/day)
-    week_num   = upload_count // 21
-    slot_in_week = upload_count % 21
-    day_idx    = slot_in_week // 3
-    slot_in_day = slot_in_week % 3
+    # 28 slots per week (7 days × 4 posts/day)
+    week_num     = upload_count // 28
+    slot_in_week = upload_count % 28
+    day_idx      = slot_in_week // 4
+    slot_in_day  = slot_in_week % 4   # 0-3 → used as Pixabay skip offset
 
     # Build full flat list of all variants (42 total)
     all_variants = []
@@ -88,7 +88,7 @@ def pick_variant() -> tuple[dict, int]:
             all_variants.append(entry)
 
     # Pick candidate via rotation
-    base_idx = (upload_count) % len(all_variants)
+    base_idx  = upload_count % len(all_variants)
     candidate = all_variants[base_idx]
 
     # If candidate was recently posted, walk forward to find a fresh one
@@ -108,7 +108,7 @@ def pick_variant() -> tuple[dict, int]:
 
     logger.info(
         f"Upload #{upload_count + 1} | Week {week_num + 1} | "
-        f"Slot {slot_in_day + 1}/3 | "
+        f"Slot {slot_in_day + 1}/4 | "
         f"Category: {cat_label} | Variant: {candidate['name']}"
     )
     return candidate, slot_in_day
