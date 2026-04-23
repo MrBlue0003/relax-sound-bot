@@ -182,8 +182,17 @@ def _build_vf(theme: dict, duration: int) -> str:
 
         # ── Progress bar track (full width, dark) ────────────────────────────
         f"drawbox=x=0:y=1855:w={WIDTH}:h=9:color=0x111111@0.85:t=fill",
-        # Progress bar fill — w grows with time (w=frame_width, t=time, t=fill=thickness mode)
-        f"drawbox=x=0:y=1855:w=w*t/{duration}:h=9:color={color}:t=fill",
+
+        # ── Progress bar fill — 30 stepped segments ──────────────────────────
+        # NOTE: in drawbox, the `t` parameter = thickness (not time!).
+        # Time-based animation must use enable='gte(t,X)' where `t` IS time.
+        *[
+            f"drawbox=x={i * (WIDTH // 30)}:y=1855"
+            f":w={WIDTH // 30 + 1}:h=9"
+            f":color={color}:t=fill"
+            f":enable='gte(t,{duration * i / 30:.2f})'"
+            for i in range(30)
+        ],
 
         # ── Loop badge ────────────────────────────────────────────────────────
         f"drawtext=fontfile='{font}':text='LOOP'"
