@@ -58,10 +58,7 @@ jobs:
         run: |
           git config user.email "relaxsound-bot@github.com"
           git config user.name "Relax Sound Bot"
-          git add logs/uploaded.json
-          git diff --staged --quiet || git commit -m "chore: update upload log [skip ci]"
-          git pull --rebase origin main
-          git push
+          python scripts/save_log.py
 
       - name: Upload logs on failure
         if: failure()
