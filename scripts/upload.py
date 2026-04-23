@@ -136,7 +136,7 @@ _UNIVERSAL_HASHTAGS = (
 )
 
 
-# ── Per-category title emoji ──────────────────────────────────────────────────
+# ── Per-category metadata ─────────────────────────────────────────────────────
 _CAT_EMOJI = {
     "rain":       "🌧️",
     "forest":     "🌿",
@@ -147,7 +147,17 @@ _CAT_EMOJI = {
     "white_noise":"💤",
 }
 
-# ── Hook phrases for description (matches assemble.py hooks) ─────────────────
+# Benefit phrase used in title: "{emoji} {name} for {benefit} #Shorts"
+_CAT_BENEFIT = {
+    "rain":       "Deep Sleep",
+    "forest":     "Focus & Calm",
+    "ocean":      "Relaxation",
+    "fireplace":  "Cozy Vibes",
+    "meditation": "Meditation",
+    "deep_sleep": "Deep Sleep",
+    "white_noise":"Focus",
+}
+
 _CAT_DESC_HOOKS = {
     "rain":       "Close your eyes and let the rain wash away your stress.",
     "forest":     "Breathe in the peaceful sounds of nature.",
@@ -158,17 +168,53 @@ _CAT_DESC_HOOKS = {
     "white_noise":"Find your focus and block out distractions.",
 }
 
+# Pinned comment per category — drives engagement (likes, replies, follows)
+_CAT_COMMENTS = {
+    "rain":       "🌧️ Which rain sound helps you sleep best? Comment below! 👇\nFollow for 4 new relaxation sounds every day 🔔",
+    "forest":     "🌿 Does nature help you focus or relax? Let me know! 👇\nFollow for daily relaxation sounds 🔔",
+    "ocean":      "🌊 Ocean lover? What's your favorite sound for sleep? 👇\nFollow for 4 new sounds every day 🔔",
+    "fireplace":  "🔥 Cozy vibes! What's your go-to comfort sound? 👇\nFollow for daily relaxation sounds 🔔",
+    "meditation": "🧘 Do you meditate with sound or in silence? 👇\nFollow for 4 new sounds every day 🔔",
+    "deep_sleep": "🌙 Can't sleep? Try this! What helps you sleep best? 👇\nFollow for daily sleep sounds 🔔",
+    "white_noise":"💤 Does white noise help you focus or sleep? 👇\nFollow for 4 new sounds every day 🔔",
+}
+
+
+def _post_comment(youtube, video_id: str, category_id: str) -> None:
+    """Post a channel-owner comment on the video to drive engagement."""
+    text = _CAT_COMMENTS.get(category_id, "🔔 Follow for daily relaxation sounds! 👇")
+    try:
+        resp = youtube.commentThreads().insert(
+            part="snippet",
+            body={
+                "snippet": {
+                    "videoId": video_id,
+                    "topLevelComment": {
+                        "snippet": {"textOriginal": text}
+                    },
+                }
+            },
+        ).execute()
+        comment_id = resp["snippet"]["topLevelComment"]["id"]
+        logger.info(f"Comment posted: {comment_id}")
+    except HttpError as e:
+        # Non-fatal — video still uploaded successfully
+        logger.warning(f"Could not post comment: {e}")
+
 
 def upload_video(video_path: Path, variant: dict) -> str:
     """Upload video to YouTube. Returns video_id."""
     if not video_path.exists():
         raise FileNotFoundError(f"Video not found: {video_path}")
 
+    from scripts.playlists import add_video_to_category_playlist
+
     name        = variant["name"]
-    subtitle    = variant["subtitle"]
+    subtitle    = variant.get("subtitle", "")
     tags_base   = variant.get("tags", [])
     category_id = variant.get("category_id", "")
     emoji       = _CAT_EMOJI.get(category_id, "🎵")
+    benefit     = _CAT_BENEFIT.get(category_id, "Relaxation")
     hook_line   = _CAT_DESC_HOOKS.get(category_id, "Relax and unwind.")
 
     # Build thematic tags list (deduplicated)
@@ -181,8 +227,9 @@ def upload_video(video_path: Path, variant: dict) -> str:
         ]
     ))
 
-    # Title: emoji + name + subtitle — keep under 100 chars
-    title = f"{emoji} {name} • {subtitle} #Shorts"
+    # Title format: "{emoji} {name} for {benefit} #Shorts"
+    # More searchable than old "name • subtitle" format
+    title = f"{emoji} {name} for {benefit} #Shorts"
     if len(title) > 100:
         title = title[:97] + "…"
 
@@ -210,7 +257,7 @@ def upload_video(video_path: Path, variant: dict) -> str:
             "title": title,
             "description": description,
             "tags": all_tags[:30],
-            "categoryId": "22",
+            "categoryId": "10",    # Music — better targeting for ambient/relaxation
             "defaultLanguage": "en",
         },
         "status": {
@@ -247,6 +294,11 @@ def upload_video(video_path: Path, variant: dict) -> str:
             video_id = response["id"]
             logger.info(f"Upload complete! https://www.youtube.com/watch?v={video_id}")
             _record_upload(video_id, title, variant)
+
+            # ── Post-upload actions (non-fatal if they fail) ──────────────
+            _post_comment(youtube, video_id, category_id)
+            add_video_to_category_playlist(youtube, video_id, category_id)
+
             return video_id
 
         except HttpError as e:

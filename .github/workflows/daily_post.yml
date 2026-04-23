@@ -49,7 +49,7 @@ jobs:
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
           YOUTUBE_CHANNEL_ID:    ${{ secrets.YOUTUBE_CHANNEL_ID }}
           UPLOAD_TIMEZONE:       Europe/Bucharest
-          VIDEO_DURATION:        120
+          VIDEO_DURATION:        60
           FORCE_VARIANT_ID:      ${{ github.event.inputs.force_variant_id }}
         run: python main.py
 

@@ -10,3 +10,4 @@ __pycache__/
 *.tmp
 !logs/uploaded.json
 !logs/uploaded_long.json
+!data/playlists.json

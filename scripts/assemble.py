@@ -197,6 +197,11 @@ def _build_vf(theme: dict, duration: int) -> str:
         # ── Loop badge ────────────────────────────────────────────────────────
         f"drawtext=fontfile='{font}':text='LOOP'"
         f":fontsize=28:fontcolor=white@0.60:x=(w-text_w)/2:y=1873",
+
+        # ── Watermark — bottom-right, very subtle ─────────────────────────────
+        f"drawtext=fontfile='{font}':text='Relax Sound'"
+        f":fontsize=22:fontcolor=white@0.30:x=w-text_w-18:y=h-36"
+        f":borderw=1:bordercolor=black@0.15",
     ]
 
     return ",".join(filters)

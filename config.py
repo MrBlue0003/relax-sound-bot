@@ -20,7 +20,7 @@ YOUTUBE_CHANNEL_ID: str = os.getenv("YOUTUBE_CHANNEL_ID", "UCz-SmRhL2fMhy68Hd-H4
 YOUTUBE_CLIENT_ID: str = os.getenv("YOUTUBE_CLIENT_ID", "")
 YOUTUBE_CLIENT_SECRET: str = os.getenv("YOUTUBE_CLIENT_SECRET", "")
 
-VIDEO_DURATION: int = int(os.getenv("RS_VIDEO_DURATION", "120"))
+VIDEO_DURATION: int = int(os.getenv("RS_VIDEO_DURATION", "60"))
 UPLOAD_TIMEZONE: str = os.getenv("UPLOAD_TIMEZONE", "Europe/Bucharest")
 
 SOUNDS_FILE = DATA_DIR / "sounds.json"
