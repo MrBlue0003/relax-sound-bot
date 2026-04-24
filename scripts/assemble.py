@@ -29,6 +29,19 @@ CAT_COLORS = {
 }
 _CAT_COLOR_DEFAULT = "0x222233"
 
+# ── Per-category color grading (ffmpeg eq filter) ─────────────────────────────
+# eq params: saturation, gamma_r/g/b (>1 boosts, <1 reduces), gamma (overall)
+CAT_GRADE = {
+    "rain":       "eq=saturation=0.90:gamma_r=0.93:gamma_b=1.08",   # cool, muted blue
+    "forest":     "eq=saturation=1.15:gamma_r=1.05:gamma_g=1.03",   # warm, lush green
+    "ocean":      "eq=saturation=0.95:gamma_r=0.91:gamma_b=1.10",   # cool teal
+    "fireplace":  "eq=saturation=1.20:gamma_r=1.12:gamma_b=0.88",   # warm amber/orange
+    "meditation": "eq=saturation=0.82:gamma=1.06:gamma_b=1.05",     # soft, dreamy purple
+    "deep_sleep": "eq=saturation=0.78:gamma=0.93:gamma_b=1.06",     # dark, cool, calm
+    "white_noise":"eq=saturation=0.88:gamma=1.02",                  # neutral, clean
+}
+_GRADE_DEFAULT = "eq=saturation=1.0"
+
 # ── Per-category hook lines (shown for first 3 s) ─────────────────────────────
 # Questions > statements — viewer thinks "that's me" → keeps watching
 CAT_HOOKS = {
@@ -142,6 +155,7 @@ def _build_vf(theme: dict, duration: int) -> str:
     font  = FONT_PATH
     cat   = theme.get("category_id", "")
     color = CAT_COLORS.get(cat, _CAT_COLOR_DEFAULT)
+    grade = CAT_GRADE.get(cat, _GRADE_DEFAULT)
     hook  = esc(theme.get("hook", CAT_HOOKS.get(cat, _HOOK_DEFAULT)))
     name  = esc(theme["name"].upper())
     sub   = esc(theme["subtitle"])
@@ -159,6 +173,9 @@ def _build_vf(theme: dict, duration: int) -> str:
         f"scale={WIDTH}:{HEIGHT}:force_original_aspect_ratio=increase",
         f"crop={WIDTH}:{HEIGHT}",
         "setsar=1",
+
+        # ── Color grading — per-category mood ───────────────────────────────
+        grade,
 
         # ── Hook banner (0–3 s) ──────────────────────────────────────────────
         f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.90:t=fill"
