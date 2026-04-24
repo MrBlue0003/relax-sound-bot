@@ -181,6 +181,10 @@ def _build_vf(theme: dict, duration: int) -> str:
         # angle=PI/5 ≈ 36° — gentle, not cinematic-heavy
         "vignette=angle=PI/5:mode=forward",
 
+        # ── Sharpening — luma 0.8, chroma 0.4 (crisp on mobile screens) ─────
+        "unsharp=luma_msize_x=5:luma_msize_y=5:luma_amount=0.8"
+        ":chroma_msize_x=3:chroma_msize_y=3:chroma_amount=0.4",
+
         # ── Hook banner (0–3 s) ──────────────────────────────────────────────
         f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.90:t=fill"
         f":enable='between(t,0,2.5)'",
