@@ -177,6 +177,10 @@ def _build_vf(theme: dict, duration: int) -> str:
         # ── Color grading — per-category mood ───────────────────────────────
         grade,
 
+        # ── Vignette — subtle dark edge, pulls focus to centre ───────────────
+        # angle=PI/5 ≈ 36° — gentle, not cinematic-heavy
+        "vignette=angle=PI/5:mode=forward",
+
         # ── Hook banner (0–3 s) ──────────────────────────────────────────────
         f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.90:t=fill"
         f":enable='between(t,0,2.5)'",
