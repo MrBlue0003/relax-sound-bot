@@ -51,6 +51,22 @@ def setup_logging() -> None:
 logger = logging.getLogger("main")
 
 
+def _load_weights() -> dict[str, float]:
+    """Load per-category performance weights from data/weights.json.
+
+    Returns {category_id: weight} where 1.0 = average.
+    Empty dict (all equal) if file missing or empty.
+    """
+    weights_file = config.DATA_DIR / "weights.json"
+    if not weights_file.exists():
+        return {}
+    try:
+        with open(weights_file, encoding="utf-8") as f:
+            return json.load(f).get("categories", {})
+    except Exception:
+        return {}
+
+
 def pick_variant() -> tuple[dict, int]:
     """Pick next variant using 7-category weekly rotation.
     Returns (variant, slot_in_day) where slot_in_day is 0/1/2/3.
@@ -79,13 +95,18 @@ def pick_variant() -> tuple[dict, int]:
     day_idx      = slot_in_week // 4
     slot_in_day  = slot_in_week % 4   # 0-3 → used as Pixabay skip offset
 
-    # Build full flat list of all variants (42 total)
+    # Build weighted pool — categories with higher avg views get more slots.
+    # Default weight 1.0 → 6 slots per variant (same as before).
+    # Weight 1.5 → 9 slots, weight 0.5 → 3 slots.
+    weights = _load_weights()
     all_variants = []
     for cat in categories:
+        cat_weight = weights.get(cat["id"], 1.0)
+        slots = max(3, min(12, round(cat_weight * 6)))
         for v in cat["variants"]:
             entry = dict(v)
             entry["category_id"] = cat["id"]
-            all_variants.append(entry)
+            all_variants.extend([entry] * slots)
 
     # Pick candidate via rotation
     base_idx  = upload_count % len(all_variants)

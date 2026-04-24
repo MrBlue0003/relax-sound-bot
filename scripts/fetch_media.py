@@ -45,7 +45,8 @@ def download_video(query: str, output_path: Path, api_key: str,
     skipped = 0
     for hit in hits_sorted:
         videos = hit.get("videos", {})
-        video = videos.get("medium") or videos.get("small") or videos.get("large")
+        # Prefer HD (large) → medium → small for best visual quality
+        video = videos.get("large") or videos.get("medium") or videos.get("small")
         if not video:
             continue
         url = video.get("url")

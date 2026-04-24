@@ -310,6 +310,7 @@ def upload_video(video_path: Path, variant: dict) -> str:
             "tags": all_tags[:30],
             "categoryId": "10",    # Music — better targeting for ambient/relaxation
             "defaultLanguage": "en",
+            "defaultAudioLanguage": "en",
         },
         "status": {
             "privacyStatus": "public",
