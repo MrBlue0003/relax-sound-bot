@@ -12,7 +12,10 @@ import json
 import subprocess
 import sys
 import time
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+_KEEP_DAYS = 90
 
 LOG       = Path("logs/uploaded.json")
 PLAYLISTS = Path("data/playlists.json")
@@ -65,8 +68,16 @@ def main() -> int:
             print("Entry already in remote log — no push needed")
             return 0
 
-        # 5. Merge: remote entries + our new entry
-        merged = {"uploads": remote_uploads + [our_entry]}
+        # 5. Merge: remote entries + our new entry, then trim to last 90 days
+        cutoff = datetime.now(timezone.utc) - timedelta(days=_KEEP_DAYS)
+        combined = remote_uploads + [our_entry]
+        combined = [
+            u for u in combined
+            if datetime.fromisoformat(
+                u.get("timestamp", "2000-01-01T00:00:00+00:00")
+            ) > cutoff
+        ]
+        merged = {"uploads": combined}
         with open(LOG, "w", encoding="utf-8") as f:
             json.dump(merged, f, indent=2)
 

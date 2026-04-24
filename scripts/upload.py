@@ -222,6 +222,15 @@ _CAT_COMMENTS = {
 }
 
 
+def _auto_like(youtube, video_id: str) -> None:
+    """Like the video with the channel owner account — small engagement signal."""
+    try:
+        youtube.videos().rate(id=video_id, rating="like").execute()
+        logger.info(f"Auto-liked: {video_id}")
+    except HttpError as e:
+        logger.warning(f"Could not auto-like: {e}")
+
+
 def _post_comment(youtube, video_id: str, category_id: str) -> None:
     """Post a channel-owner comment on the video to drive engagement."""
     text = _CAT_COMMENTS.get(category_id, "🔔 Follow for daily relaxation sounds! 👇")
@@ -338,6 +347,7 @@ def upload_video(video_path: Path, variant: dict) -> str:
             _record_upload(video_id, title, variant)
 
             # ── Post-upload actions (non-fatal if they fail) ──────────────
+            _auto_like(youtube, video_id)
             _post_comment(youtube, video_id, category_id)
             add_video_to_category_playlist(youtube, video_id, category_id)
 

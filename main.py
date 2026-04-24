@@ -128,6 +128,27 @@ def _find_variant_by_id(variant_id: str) -> tuple[dict, int]:
     raise ValueError(f"Variant ID not found in sounds.json: {variant_id!r}")
 
 
+def _variant_posted_recently(variant_id: str, hours: int = 20) -> bool:
+    """Return True if this variant was already uploaded in the last N hours.
+
+    Guards against double-runs from manual workflow_dispatch triggers.
+    """
+    if not config.UPLOADED_FILE.exists():
+        return False
+    from datetime import timedelta
+    with open(config.UPLOADED_FILE, encoding="utf-8") as f:
+        log = json.load(f)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    for u in log.get("uploads", []):
+        if u.get("variant_id") == variant_id:
+            try:
+                if datetime.fromisoformat(u["timestamp"]) > cutoff:
+                    return True
+            except Exception:
+                pass
+    return False
+
+
 def get_work_dir(timestamp: str) -> Path:
     if os.name == "nt":
         work_dir = Path(f"E:/temp/rs/{timestamp}")
@@ -158,6 +179,14 @@ def main() -> int:
             variant, slot_in_day = _find_variant_by_id(force_id)
         else:
             variant, slot_in_day = pick_variant()
+
+        # Guard: skip if this variant was already posted in the last 20 h
+        # (prevents duplicate uploads on accidental double workflow_dispatch)
+        if _variant_posted_recently(variant["id"]):
+            logger.warning(
+                f"Variant '{variant['name']}' was already uploaded recently — skipping."
+            )
+            return 0
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         work_dir = get_work_dir(timestamp)
 
