@@ -11,6 +11,10 @@ on:
         required: false
         default: ''
 
+concurrency:
+  group: relax-sound-post
+  cancel-in-progress: false   # queue, don't cancel — the second run posts normally after the first
+
 jobs:
   post:
     runs-on: ubuntu-latest
