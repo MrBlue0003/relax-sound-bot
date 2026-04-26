@@ -1,4 +1,11 @@
 {
-  "updated": "2026-04-23",
-  "categories": {}
+  "updated": "2026-04-26",
+  "categories": {
+    "rain": 1.223,
+    "meditation": 1.511,
+    "white_noise": 0.5,
+    "ocean": 1.319,
+    "forest": 1.5,
+    "fireplace": 0.5
+  }
 }
