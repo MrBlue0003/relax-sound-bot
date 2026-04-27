@@ -260,6 +260,9 @@ def main() -> int:
         logger.info(f"  Completed in {elapsed:.0f}s")
         logger.info("=" * 60)
 
+        # Copy video to output/ for TikTok artifact before cleanup
+        tiktok_copy = config.OUTPUT_DIR / output_path.name
+        shutil.copy2(output_path, tiktok_copy)
         shutil.rmtree(work_dir, ignore_errors=True)
 
         # Monthly Best Of compilation — runs automatically on day 1-3 of each month

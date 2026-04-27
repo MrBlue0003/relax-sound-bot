@@ -64,6 +64,14 @@ jobs:
           git config user.name "Relax Sound Bot"
           python scripts/save_log.py
 
+      - name: Upload video for TikTok
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiktok-video-${{ github.run_id }}
+          path: output/*.mp4
+          retention-days: 3
+
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
