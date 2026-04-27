@@ -81,7 +81,7 @@ _UNIVERSAL_LONG = (
     "#RelaxingMusic #AnxietyRelief #PeacefulMusic #ZenMusic #LofiChill "
     "#SleepAid #MeditationMusic #BackgroundMusic #FocusMusic #SelfCare "
     "#MentalHealth #Relaxation #InnerPeace #Soundscape #AmbientMusic "
-    "#NatureTherapy #HealingMusic #3Hours #LongVideo #AmbientSounds #NoAds"
+    "#NatureTherapy #HealingMusic #10Hours #LongVideo #AmbientSounds #NoAds"
 )
 
 # Extra hashtags for new categories

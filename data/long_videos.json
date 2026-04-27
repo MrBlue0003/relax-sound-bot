@@ -1,209 +1,209 @@
 {
   "long_videos": [
     {
-      "id": "rain_sleep_3h",
+      "id": "rain_sleep_10h",
       "category": "rain",
-      "duration_hours": 3,
-      "title": "3 Hours of Rain Sounds for Deep Sleep 🌧️ | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Rain Sounds for Deep Sleep 🌧️ | No Ads",
       "subtitle": "Soft rainfall to help you drift off into restful sleep",
       "audio_file": "rain.mp3",
       "video_queries": ["rain window drops", "rainfall nature", "rain drops slow"],
       "image_queries": ["rain window", "rainfall", "rain drops"],
-      "tags": ["rain sounds", "sleep sounds", "3 hour rain", "rain for sleeping", "rain sleep", "rain asmr", "sleep aid", "no ads"]
+      "tags": ["rain sounds", "sleep sounds", "10 hour rain", "rain for sleeping", "rain sleep", "rain asmr", "sleep aid", "no ads"]
     },
     {
-      "id": "rain_focus_3h",
+      "id": "rain_focus_10h",
       "category": "rain",
-      "duration_hours": 3,
-      "title": "3 Hours of Rain Sounds for Study & Focus 🌧️ | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Rain Sounds for Study & Focus 🌧️ | No Ads",
       "subtitle": "Steady rainfall to boost concentration and productivity",
       "audio_file": "rain.mp3",
       "video_queries": ["rain window office", "rain drops glass", "rainfall forest"],
       "image_queries": ["rain study", "rain window", "rain drops glass"],
-      "tags": ["rain sounds", "study sounds", "3 hour rain", "focus music", "rain study", "concentration", "productivity", "no ads"]
+      "tags": ["rain sounds", "study sounds", "10 hour rain", "focus music", "rain study", "concentration", "productivity", "no ads"]
     },
     {
-      "id": "rain_relax_3h",
+      "id": "rain_relax_10h",
       "category": "rain",
-      "duration_hours": 3,
-      "title": "3 Hours of Gentle Rain for Relaxation & Stress Relief 🌧️",
+      "duration_hours": 10,
+      "title": "10 Hours of Gentle Rain for Relaxation & Stress Relief 🌧️",
       "subtitle": "Let the calming sound of rain wash away your stress",
       "audio_file": "rain.mp3",
       "video_queries": ["gentle rain nature", "rain garden", "rain leaves"],
       "image_queries": ["rain garden", "gentle rain", "rain forest"],
-      "tags": ["rain sounds", "relaxation", "3 hour rain", "stress relief", "gentle rain", "calming", "anxiety relief"]
+      "tags": ["rain sounds", "relaxation", "10 hour rain", "stress relief", "gentle rain", "calming", "anxiety relief"]
     },
     {
-      "id": "thunderstorm_3h",
+      "id": "thunderstorm_10h",
       "category": "rain",
-      "duration_hours": 3,
-      "title": "3 Hours of Thunderstorm Sounds for Deep Sleep ⛈️ | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Thunderstorm Sounds for Deep Sleep ⛈️ | No Ads",
       "subtitle": "Powerful thunder and rain to mask noise and induce sleep",
       "audio_file": "rain.mp3",
       "video_queries": ["thunderstorm lightning rain", "storm dark clouds", "heavy rain storm"],
       "image_queries": ["thunderstorm", "lightning storm", "dark storm clouds"],
-      "tags": ["thunderstorm", "thunder sounds", "storm sounds", "3 hour", "sleep sounds", "rain sleep", "heavy rain", "no ads"]
+      "tags": ["thunderstorm", "thunder sounds", "storm sounds", "10 hour", "sleep sounds", "rain sleep", "heavy rain", "no ads"]
     },
     {
-      "id": "forest_rain_3h",
+      "id": "forest_rain_10h",
       "category": "rain",
-      "duration_hours": 3,
-      "title": "3 Hours of Rain in the Forest 🌿 | Nature Sounds for Sleep",
+      "duration_hours": 10,
+      "title": "10 Hours of Rain in the Forest 🌿 | Nature Sounds for Sleep",
       "subtitle": "Raindrops on leaves in a peaceful woodland",
       "audio_file": "forest_rain.mp3",
       "video_queries": ["rain forest trees", "forest rain drops", "woodland rain"],
       "image_queries": ["forest rain", "rain in forest", "woodland rain"],
-      "tags": ["forest rain", "rain sounds", "nature sounds", "3 hour", "forest sleep", "woodland sounds", "rain forest"]
+      "tags": ["forest rain", "rain sounds", "nature sounds", "10 hour", "forest sleep", "woodland sounds", "rain forest"]
     },
     {
-      "id": "forest_birds_3h",
+      "id": "forest_birds_10h",
       "category": "forest",
-      "duration_hours": 3,
-      "title": "3 Hours of Forest Birds 🌿 | Morning Nature Sounds | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Forest Birds 🌿 | Morning Nature Sounds | No Ads",
       "subtitle": "Wake up gently to the symphony of birds in the forest",
       "audio_file": "forest_birds.mp3",
       "video_queries": ["forest birds trees", "woodland morning", "birds forest green"],
       "image_queries": ["forest morning", "birds in trees", "woodland birds"],
-      "tags": ["forest birds", "bird sounds", "nature sounds", "3 hour birds", "morning birds", "bird songs", "forest sounds", "no ads"]
+      "tags": ["forest birds", "bird sounds", "nature sounds", "10 hour birds", "morning birds", "bird songs", "forest sounds", "no ads"]
     },
     {
-      "id": "morning_birds_3h",
+      "id": "morning_birds_10h",
       "category": "forest",
-      "duration_hours": 3,
-      "title": "3 Hours of Morning Birds 🌅 for Peaceful Awakening | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Morning Birds 🌅 for Peaceful Awakening | No Ads",
       "subtitle": "Gentle birdsong to start your day with calm and clarity",
       "audio_file": "morning_birds.mp3",
       "video_queries": ["morning sunrise birds", "dawn forest light", "sunrise nature"],
       "image_queries": ["sunrise morning", "dawn birds", "morning forest light"],
-      "tags": ["morning birds", "bird sounds", "nature sounds", "3 hour", "morning routine", "peaceful morning", "bird songs", "no ads"]
+      "tags": ["morning birds", "bird sounds", "nature sounds", "10 hour", "morning routine", "peaceful morning", "bird songs", "no ads"]
     },
     {
-      "id": "wind_trees_3h",
+      "id": "wind_trees_10h",
       "category": "forest",
-      "duration_hours": 3,
-      "title": "3 Hours of Wind Through the Trees 🌿 | Relaxing Nature Sounds",
+      "duration_hours": 10,
+      "title": "10 Hours of Wind Through the Trees 🌿 | Relaxing Nature Sounds",
       "subtitle": "The soothing sound of a gentle breeze rustling through leaves",
       "audio_file": "wind_trees.mp3",
       "video_queries": ["wind trees swaying", "forest breeze leaves", "wind nature trees"],
       "image_queries": ["wind trees", "breeze forest", "swaying trees"],
-      "tags": ["wind sounds", "nature sounds", "3 hour", "wind trees", "forest sounds", "breeze sounds", "relaxing nature"]
+      "tags": ["wind sounds", "nature sounds", "10 hour", "wind trees", "forest sounds", "breeze sounds", "relaxing nature"]
     },
     {
-      "id": "night_crickets_3h",
+      "id": "night_crickets_10h",
       "category": "forest",
-      "duration_hours": 3,
-      "title": "3 Hours of Night Crickets 🌙 | Peaceful Evening Ambience",
+      "duration_hours": 10,
+      "title": "10 Hours of Night Crickets 🌙 | Peaceful Evening Ambience",
       "subtitle": "Crickets and frogs under a summer night sky",
       "audio_file": "night_nature.mp3",
       "video_queries": ["night forest stars", "summer night nature", "crickets grass night"],
       "image_queries": ["night nature stars", "summer night", "moonlight forest"],
-      "tags": ["cricket sounds", "night sounds", "nature sounds", "3 hour", "evening sounds", "frogs crickets", "sleep night"]
+      "tags": ["cricket sounds", "night sounds", "nature sounds", "10 hour", "evening sounds", "frogs crickets", "sleep night"]
     },
     {
-      "id": "ocean_sleep_3h",
+      "id": "ocean_sleep_10h",
       "category": "ocean",
-      "duration_hours": 3,
-      "title": "3 Hours of Ocean Waves for Deep Sleep 🌊 | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Ocean Waves for Deep Sleep 🌊 | No Ads",
       "subtitle": "Rhythmic waves rolling onto shore to carry you to sleep",
       "audio_file": "ocean_waves.mp3",
       "video_queries": ["ocean waves beach", "sea waves shore", "ocean sunset"],
       "image_queries": ["ocean waves", "beach waves", "sea shore"],
-      "tags": ["ocean sounds", "wave sounds", "3 hour ocean", "sleep sounds", "beach sounds", "ocean waves", "sea sounds", "no ads"]
+      "tags": ["ocean sounds", "wave sounds", "10 hour ocean", "sleep sounds", "beach sounds", "ocean waves", "sea sounds", "no ads"]
     },
     {
-      "id": "beach_waves_3h",
+      "id": "beach_waves_10h",
       "category": "ocean",
-      "duration_hours": 3,
-      "title": "3 Hours of Beach Waves 🌊 | Tropical Relaxation Sounds",
+      "duration_hours": 10,
+      "title": "10 Hours of Beach Waves 🌊 | Tropical Relaxation Sounds",
       "subtitle": "Tropical beach sounds to transport you to paradise",
       "audio_file": "ocean_waves.mp3",
       "video_queries": ["tropical beach waves", "beach shore calm", "ocean tropical"],
       "image_queries": ["tropical beach", "paradise waves", "beach relax"],
-      "tags": ["beach sounds", "wave sounds", "3 hour beach", "tropical sounds", "ocean relaxation", "beach waves", "paradise"]
+      "tags": ["beach sounds", "wave sounds", "10 hour beach", "tropical sounds", "ocean relaxation", "beach waves", "paradise"]
     },
     {
-      "id": "ocean_meditation_3h",
+      "id": "ocean_meditation_10h",
       "category": "ocean",
-      "duration_hours": 3,
-      "title": "3 Hours of Ocean Sounds for Meditation & Yoga 🌊 | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Ocean Sounds for Meditation & Yoga 🌊 | No Ads",
       "subtitle": "Let the ocean guide you into a state of deep calm",
       "audio_file": "ocean_waves.mp3",
       "video_queries": ["ocean meditation calm", "sea sunrise peaceful", "ocean waves slow"],
       "image_queries": ["ocean meditation", "sea calm", "peaceful ocean"],
-      "tags": ["ocean sounds", "meditation sounds", "3 hour", "yoga sounds", "ocean meditation", "sea meditation", "mindfulness", "no ads"]
+      "tags": ["ocean sounds", "meditation sounds", "10 hour", "yoga sounds", "ocean meditation", "sea meditation", "mindfulness", "no ads"]
     },
     {
-      "id": "fireplace_cozy_3h",
+      "id": "fireplace_cozy_10h",
       "category": "fireplace",
-      "duration_hours": 3,
-      "title": "3 Hours of Crackling Fireplace 🔥 | Cozy Winter Sounds | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Crackling Fireplace 🔥 | Cozy Winter Sounds | No Ads",
       "subtitle": "Warm and crackling fire for your coziest moments",
       "audio_file": "crackling_fire.mp3",
       "video_queries": ["fireplace crackling", "cozy fireplace winter", "wood fire burning"],
       "image_queries": ["fireplace cozy", "crackling fire", "wood fire warm"],
-      "tags": ["fireplace sounds", "crackling fire", "3 hour fireplace", "cozy sounds", "winter sounds", "fire asmr", "hygge", "no ads"]
+      "tags": ["fireplace sounds", "crackling fire", "10 hour fireplace", "cozy sounds", "winter sounds", "fire asmr", "hygge", "no ads"]
     },
     {
-      "id": "campfire_3h",
+      "id": "campfire_10h",
       "category": "fireplace",
-      "duration_hours": 3,
-      "title": "3 Hours of Campfire Sounds 🔥 | Outdoor Night Ambience",
+      "duration_hours": 10,
+      "title": "10 Hours of Campfire Sounds 🔥 | Outdoor Night Ambience",
       "subtitle": "Sit by the campfire under a starry sky",
       "audio_file": "crackling_fire.mp3",
       "video_queries": ["campfire night outdoor", "bonfire nature night", "campfire stars"],
       "image_queries": ["campfire night", "bonfire outdoor", "campfire stars"],
-      "tags": ["campfire sounds", "fire sounds", "3 hour", "outdoor sounds", "night sounds", "bonfire", "camping sounds"]
+      "tags": ["campfire sounds", "fire sounds", "10 hour", "outdoor sounds", "night sounds", "bonfire", "camping sounds"]
     },
     {
-      "id": "fireplace_rain_3h",
+      "id": "fireplace_rain_10h",
       "category": "fireplace",
-      "duration_hours": 3,
-      "title": "3 Hours Fireplace & Rain 🔥🌧️ | Ultimate Cozy Sounds | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours Fireplace & Rain 🔥🌧️ | Ultimate Cozy Sounds | No Ads",
       "subtitle": "Rain outside, warm fire inside — pure comfort",
       "audio_file": "forest_rain.mp3",
       "video_queries": ["fireplace rainy night", "cozy fire rain window", "fireplace warm winter"],
       "image_queries": ["cozy fireplace rain", "fire rain window", "winter fireplace rain"],
-      "tags": ["fireplace rain", "cozy sounds", "3 hour", "rain and fire", "winter sounds", "cozy vibes", "sleep sounds", "no ads"]
+      "tags": ["fireplace rain", "cozy sounds", "10 hour", "rain and fire", "winter sounds", "cozy vibes", "sleep sounds", "no ads"]
     },
     {
-      "id": "white_noise_sleep_3h",
+      "id": "white_noise_sleep_10h",
       "category": "white_noise",
-      "duration_hours": 3,
-      "title": "3 Hours of White Noise for Deep Sleep 💤 | Baby Sleep | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of White Noise for Deep Sleep 💤 | Baby Sleep | No Ads",
       "subtitle": "Pure white noise to block distractions and induce sleep",
       "video_queries": ["fan noise bedroom", "electric fan spinning", "ceiling fan"],
       "image_queries": ["fan bedroom", "white noise machine", "peaceful bedroom"],
-      "tags": ["white noise", "sleep sounds", "3 hour", "baby sleep", "sleep aid", "no ads", "white noise machine", "fan sound"]
+      "tags": ["white noise", "sleep sounds", "10 hour", "baby sleep", "sleep aid", "no ads", "white noise machine", "fan sound"]
     },
     {
-      "id": "brown_noise_focus_3h",
+      "id": "brown_noise_focus_10h",
       "category": "deep_sleep",
-      "duration_hours": 3,
-      "title": "3 Hours of Brown Noise for Focus & ADHD 🌙 | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours of Brown Noise for Focus & ADHD 🌙 | No Ads",
       "subtitle": "Deep brown noise for concentration, ADHD, and productivity",
       "video_queries": ["dark forest night", "deep dark nature", "night sky stars peaceful"],
       "image_queries": ["night sky", "dark forest", "peaceful night"],
-      "tags": ["brown noise", "focus", "ADHD", "3 hour", "concentration", "deep work", "productivity", "no ads"]
+      "tags": ["brown noise", "focus", "ADHD", "10 hour", "concentration", "deep work", "productivity", "no ads"]
     },
     {
-      "id": "coffee_shop_3h",
+      "id": "coffee_shop_10h",
       "category": "coffee_shop",
-      "duration_hours": 3,
-      "title": "3 Hours Coffee Shop Ambience ☕ | Study & Work Sounds | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours Coffee Shop Ambience ☕ | Study & Work Sounds | No Ads",
       "subtitle": "Cozy café sounds to boost productivity and focus",
       "video_queries": ["coffee shop cafe interior", "cafe ambience people", "cozy coffee shop"],
       "image_queries": ["coffee shop cozy", "cafe interior", "coffee mug table"],
-      "tags": ["coffee shop sounds", "cafe ambience", "study sounds", "work sounds", "3 hour", "focus music", "lofi study", "no ads"]
+      "tags": ["coffee shop sounds", "cafe ambience", "study sounds", "work sounds", "10 hour", "focus music", "lofi study", "no ads"]
     },
     {
-      "id": "meditation_hz_3h",
+      "id": "meditation_hz_10h",
       "category": "meditation",
-      "duration_hours": 3,
-      "title": "3 Hours 432Hz Healing Music 🧘 | Deep Meditation | No Ads",
+      "duration_hours": 10,
+      "title": "10 Hours 432Hz Healing Music 🧘 | Deep Meditation | No Ads",
       "subtitle": "Ancient healing frequency to align your mind and body",
       "video_queries": ["meditation calm nature", "peaceful zen garden", "spiritual meditation"],
       "image_queries": ["meditation nature", "zen garden", "peaceful sunrise"],
-      "tags": ["432hz", "healing music", "meditation music", "3 hour", "sleep music", "no ads", "solfeggio", "healing frequency"]
+      "tags": ["432hz", "healing music", "meditation music", "10 hour", "sleep music", "no ads", "solfeggio", "healing frequency"]
     }
   ]
 }
