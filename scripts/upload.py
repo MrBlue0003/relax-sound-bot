@@ -119,6 +119,12 @@ _CATEGORY_HASHTAGS = {
         "#PowerNap #NapMusic #SleepASMR #BabySleep #SleepNoises "
         "#KidsAsleep #SoothingNight #NightRelax #SleepStories #DreamSound"
     ),
+    "coffee_shop": (
+        "#CoffeeShop #CafeAmbience #StudyWithMe #LofiStudy #CoffeeSounds "
+        "#WorkFromHome #FocusMusic #CafeNoise #StudySounds #ProductivityMusic "
+        "#LofiCafe #WorkSounds #StudyMotivation #DeepFocus #CoffeeVibes "
+        "#StudyTok #FocusTok #KeyboardASMR #LibraryAmbience #CafeStudy"
+    ),
 }
 
 # ── Universal viral hashtags ──────────────────────────────────────────────────
@@ -138,34 +144,37 @@ _UNIVERSAL_HASHTAGS = (
 
 # ── Per-category metadata ─────────────────────────────────────────────────────
 _CAT_EMOJI = {
-    "rain":       "🌧️",
-    "forest":     "🌿",
-    "ocean":      "🌊",
-    "fireplace":  "🔥",
-    "meditation": "🧘",
-    "deep_sleep": "🌙",
-    "white_noise":"💤",
+    "rain":        "🌧️",
+    "forest":      "🌿",
+    "ocean":       "🌊",
+    "fireplace":   "🔥",
+    "meditation":  "🧘",
+    "deep_sleep":  "🌙",
+    "white_noise": "💤",
+    "coffee_shop": "☕",
 }
 
 # Benefit phrase used in title: "{emoji} {name} for {benefit} #Shorts"
 _CAT_BENEFIT = {
-    "rain":       "Deep Sleep",
-    "forest":     "Focus & Calm",
-    "ocean":      "Relaxation",
-    "fireplace":  "Cozy Vibes",
-    "meditation": "Meditation",
-    "deep_sleep": "Deep Sleep",
-    "white_noise":"Focus",
+    "rain":        "Deep Sleep",
+    "forest":      "Focus & Calm",
+    "ocean":       "Relaxation",
+    "fireplace":   "Cozy Vibes",
+    "meditation":  "Meditation",
+    "deep_sleep":  "Deep Sleep",
+    "white_noise": "Focus",
+    "coffee_shop": "Study & Focus",
 }
 
 _CAT_DESC_HOOKS = {
-    "rain":       "Close your eyes and let the rain wash away your stress.",
-    "forest":     "Breathe in the peaceful sounds of nature.",
-    "ocean":      "Let the waves carry you to a place of calm.",
-    "fireplace":  "Get cozy and let the fire warm your soul.",
-    "meditation": "Clear your mind and find your inner peace.",
-    "deep_sleep": "Drift off into deep, restful sleep.",
-    "white_noise":"Find your focus and block out distractions.",
+    "rain":        "Close your eyes and let the rain wash away your stress.",
+    "forest":      "Breathe in the peaceful sounds of nature.",
+    "ocean":       "Let the waves carry you to a place of calm.",
+    "fireplace":   "Get cozy and let the fire warm your soul.",
+    "meditation":  "Clear your mind and find your inner peace.",
+    "deep_sleep":  "Drift off into deep, restful sleep.",
+    "white_noise": "Find your focus and block out distractions.",
+    "coffee_shop": "Get in the zone with the perfect study ambience.",
 }
 
 # Pinned comment per category — numbered poll format drives replies & watch time
@@ -219,6 +228,13 @@ _CAT_COMMENTS = {
         "3️⃣ Fall asleep faster\n"
         "👇 Which one?\n\n"
         "Follow for 4 new sounds every day 🔔",
+    "coffee_shop":
+        "☕ Where do you study best?\n"
+        "1️⃣ Coffee shop\n"
+        "2️⃣ Library\n"
+        "3️⃣ At home with ambience\n"
+        "👇 Drop your answer below!\n\n"
+        "Follow for daily focus sounds 🔔",
 }
 
 

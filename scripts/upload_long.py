@@ -81,8 +81,17 @@ _UNIVERSAL_LONG = (
     "#RelaxingMusic #AnxietyRelief #PeacefulMusic #ZenMusic #LofiChill "
     "#SleepAid #MeditationMusic #BackgroundMusic #FocusMusic #SelfCare "
     "#MentalHealth #Relaxation #InnerPeace #Soundscape #AmbientMusic "
-    "#NatureTherapy #HealingMusic #1Hour #LongVideo #AmbientSounds"
+    "#NatureTherapy #HealingMusic #3Hours #LongVideo #AmbientSounds #NoAds"
 )
+
+# Extra hashtags for new categories
+_CATEGORY_HASHTAGS_EXTRA = {
+    "coffee_shop": (
+        "#CoffeeShop #CafeAmbience #StudyWithMe #LofiStudy #CoffeeSounds "
+        "#WorkFromHome #FocusMusic #CafeNoise #StudySounds #ProductivityMusic "
+        "#LofiCafe #WorkSounds #StudyMotivation #DeepFocus #CoffeeVibes"
+    ),
+}
 
 
 def _get_youtube_client():
@@ -159,7 +168,7 @@ def upload_long_video(video_path: Path, variant: dict) -> str:
     chapters = _make_chapters(duration_hours)
 
     # Hashtags
-    cat_tags = _CATEGORY_HASHTAGS.get(category, "")
+    cat_tags = _CATEGORY_HASHTAGS.get(category, "") or _CATEGORY_HASHTAGS_EXTRA.get(category, "")
     variant_hashtags = " ".join(f"#{t.replace(' ', '')}" for t in tags_base[:15])
     hashtags = f"{_UNIVERSAL_LONG}\n{cat_tags}\n{variant_hashtags}"
 
