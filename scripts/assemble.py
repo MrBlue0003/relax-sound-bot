@@ -1,11 +1,14 @@
-"""assemble.py — Build a 120-second relaxation Short with rich overlay.
+"""assemble.py — Build a relaxation Short with rich overlay.
 
 Visual design:
-  • Hook text for first 3s  — grabs the 2-second algorithm retention check
-  • Category-coloured accent — visual brand identity per sound type
-  • Fake bottom gradient    — readability without covering the scenery
-  • Animated progress bar   — keeps viewers watching to the end
-  • Loop badge              — sets expectation, reduces drop-off
+  • Hook text for first 3s   — grabs the 2-second algorithm retention check
+  • Category-coloured accent  — visual brand identity per sound type
+  • Fake bottom gradient      — readability without covering the scenery
+  • Animated progress bar     — keeps viewers watching to the end
+  • Loop badge                — sets expectation, reduces drop-off
+  • Category label badge      — top-right pill for instant visual ID
+  • End-screen CTA (last 5s)  — "Follow + Save" drives algorithm signals
+  • Slot-based hook rotation  — 3 hooks/category so each post feels fresh
 """
 import logging
 import platform
@@ -19,39 +22,43 @@ HEIGHT = 1920
 
 # ── Per-category accent colours (ffmpeg 0xRRGGBB) ────────────────────────────
 CAT_COLORS = {
-    "rain":       "0x2255BB",   # deep blue
-    "forest":     "0x1A7A22",   # forest green
-    "ocean":      "0x006688",   # teal
-    "fireplace":  "0xBB4400",   # ember orange
-    "meditation": "0x6633AA",   # purple
-    "deep_sleep": "0x1A1A66",   # midnight blue
-    "white_noise":"0x445566",   # slate
+    "rain":        "0x2255BB",   # deep blue
+    "forest":      "0x1A7A22",   # forest green
+    "ocean":       "0x006688",   # teal
+    "fireplace":   "0xBB4400",   # ember orange
+    "meditation":  "0x6633AA",   # purple
+    "deep_sleep":  "0x1A1A66",   # midnight blue
+    "white_noise": "0x445566",   # slate
+    "coffee_shop": "0x6B3A2A",   # coffee brown
 }
 _CAT_COLOR_DEFAULT = "0x222233"
 
 # ── Per-category color grading (ffmpeg eq filter) ─────────────────────────────
 # eq params: saturation, gamma_r/g/b (>1 boosts, <1 reduces), gamma (overall)
 CAT_GRADE = {
-    "rain":       "eq=saturation=0.90:gamma_r=0.93:gamma_b=1.08",   # cool, muted blue
-    "forest":     "eq=saturation=1.15:gamma_r=1.05:gamma_g=1.03",   # warm, lush green
-    "ocean":      "eq=saturation=0.95:gamma_r=0.91:gamma_b=1.10",   # cool teal
-    "fireplace":  "eq=saturation=1.20:gamma_r=1.12:gamma_b=0.88",   # warm amber/orange
-    "meditation": "eq=saturation=0.82:gamma=1.06:gamma_b=1.05",     # soft, dreamy purple
-    "deep_sleep": "eq=saturation=0.78:gamma=0.93:gamma_b=1.06",     # dark, cool, calm
-    "white_noise":"eq=saturation=0.88:gamma=1.02",                  # neutral, clean
+    "rain":        "eq=saturation=0.90:gamma_r=0.93:gamma_b=1.08",    # cool, muted blue
+    "forest":      "eq=saturation=1.15:gamma_r=1.05:gamma_g=1.03",    # warm, lush green
+    "ocean":       "eq=saturation=0.95:gamma_r=0.91:gamma_b=1.10",    # cool teal
+    "fireplace":   "eq=saturation=1.20:gamma_r=1.12:gamma_b=0.88",    # warm amber/orange
+    "meditation":  "eq=saturation=0.82:gamma=1.06:gamma_b=1.05",      # soft, dreamy purple
+    "deep_sleep":  "eq=saturation=0.78:gamma=0.93:gamma_b=1.06",      # dark, cool, calm
+    "white_noise": "eq=saturation=0.88:gamma=1.02",                   # neutral, clean
+    "coffee_shop": "eq=saturation=1.10:gamma_r=1.10:gamma_b=0.92",    # warm golden-brown
 }
 _GRADE_DEFAULT = "eq=saturation=1.0"
 
 # ── Per-category hook lines (shown for first 3 s) ─────────────────────────────
-# Questions > statements — viewer thinks "that's me" → keeps watching
-CAT_HOOKS = {
-    "rain":       "Can't sleep?",
-    "forest":     "Feeling stressed?",
-    "ocean":      "Need to relax?",
-    "fireplace":  "Get cozy...",
-    "meditation": "Need to focus?",
-    "deep_sleep": "Can't sleep?",
-    "white_noise":"Stay focused",
+# 3 hooks per category — rotated by slot so each daily post feels fresh.
+# Questions > statements — viewer thinks "that's me" → keeps watching.
+CAT_HOOKS: dict[str, list[str]] = {
+    "rain":        ["Can't sleep?",          "Stressed out?",           "Rain to the rescue..."],
+    "forest":      ["Feeling stressed?",     "Take a deep breath...",   "Nature heals"],
+    "ocean":       ["Need to relax?",        "Clear your mind...",      "Drift away..."],
+    "fireplace":   ["Get cozy...",           "Time to unwind...",       "Warm your soul"],
+    "meditation":  ["Need to focus?",        "Quiet your mind...",      "Find your peace"],
+    "deep_sleep":  ["Can't sleep?",          "Silence the noise...",    "Rest deeply..."],
+    "white_noise": ["Stay focused",          "Block the noise",         "Deep focus mode"],
+    "coffee_shop": ["Get in the zone...",    "Study time!",             "Focus and flow"],
 }
 _HOOK_DEFAULT = "Need to relax?"
 
@@ -136,29 +143,44 @@ def _video_has_audio(video_path: Path) -> bool:
         return False
 
 
-def _build_vf(theme: dict, duration: int) -> str:
+def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
     """
     Build the full ffmpeg -vf filter chain.
 
     Layout (1080×1920):
-      y=0–180   : HOOK TEXT — category colour box, big text, 3 s then gone
-      y=180–1500: clean ambient video (no overlays)
-      y=1500–1920: bottom zone
-          1500–1920: fake gradient (3 dark layers)
-          1500–1920: 10-px left accent stripe
-          1560     : NAME   (fontsize 84, white, bold)
-          1700     : subtitle (fontsize 42, white 92%)
-          1860–1868: progress bar track (dark)
-          1860–1868: progress bar fill (animated, category colour)
-          1876     : "LOOP" badge text
+      y=0–90    : HOOK TEXT (0-3s) → END-SCREEN CTA (last 5s) — same banner zone
+      y=90–1480 : clean ambient video (no overlays)
+      y=0–56    : category label badge, top-right pill (appears after hook fades)
+      y=1480–1920: bottom zone
+          1480–1920: fake gradient (3 dark layers)
+          1480–1920: 10-px left accent stripe
+          1555     : NAME   (fontsize 84, white, bold)
+          1652     : thin separator line
+          1668     : subtitle (fontsize 42, white 92%)
+          1855–1864: progress bar track (dark)
+          1855–1864: progress bar fill (animated, category colour)
+          1873     : "LOOP" badge text
     """
     font  = FONT_PATH
     cat   = theme.get("category_id", "")
     color = CAT_COLORS.get(cat, _CAT_COLOR_DEFAULT)
     grade = CAT_GRADE.get(cat, _GRADE_DEFAULT)
-    hook  = esc(theme.get("hook", CAT_HOOKS.get(cat, _HOOK_DEFAULT)))
+
+    # Slot-based hook rotation — pick from list; fall back to theme override or default
+    hooks_opt = CAT_HOOKS.get(cat)
+    if isinstance(hooks_opt, list):
+        hook_raw = hooks_opt[slot % len(hooks_opt)]
+    elif isinstance(hooks_opt, str):
+        hook_raw = hooks_opt
+    else:
+        hook_raw = _HOOK_DEFAULT
+    hook = esc(theme.get("hook", hook_raw))
+
     name  = esc(theme["name"].upper())
     sub   = esc(theme["subtitle"])
+
+    # Category label badge text (ASCII only — emoji unsupported in drawtext)
+    cat_label = cat.upper().replace("_", " ")
 
     # Dynamic loop label: "1 MIN LOOP", "2 MIN LOOP", or "60S LOOP" etc.
     if duration >= 60 and duration % 60 == 0:
@@ -252,13 +274,37 @@ def _build_vf(theme: dict, duration: int) -> str:
         f"drawtext=fontfile='{font}':text='Relax Sound'"
         f":fontsize=22:fontcolor=white@0.30:x=w-text_w-18:y=h-36"
         f":borderw=1:bordercolor=black@0.15",
+
+        # ── Category label badge — top-right pill (visible after hook fades) ──
+        # Dark pill box: fixed width covers longest label ("WHITE NOISE" / "COFFEE SHOP")
+        f"drawbox=x={WIDTH - 210}:y=8:w=202:h=50:color=black@0.62:t=fill"
+        f":enable='between(t,3.1,{duration})'",
+        f"drawtext=fontfile='{font}':text='{cat_label}'"
+        f":fontsize=25:fontcolor={color}@0.95"
+        f":x=w-text_w-18:y=21"
+        f":borderw=1:bordercolor=black@0.35"
+        f":enable='between(t,3.1,{duration})'",
+
+        # ── End-screen CTA — reuses hook banner zone for last 5 seconds ───────
+        # Drives follows + saves — the two biggest Shorts algorithm signals.
+        *[
+            f"drawbox=x=0:y=0:w={WIDTH}:h=90:color={color}@0.90:t=fill"
+            f":enable='gte(t,{max(duration - 5, 4)})'",
+            f"drawbox=x=0:y=83:w={WIDTH}:h=7:color=black@0.55:t=fill"
+            f":enable='gte(t,{max(duration - 5, 4)})'",
+            f"drawtext=fontfile='{font}':text='Follow for daily calm  +  Save for tonight'"
+            f":fontsize=34:fontcolor=white:x=(w-text_w)/2:y=24"
+            f":borderw=2:bordercolor=black@0.50"
+            f":enable='gte(t,{max(duration - 5, 4)})'",
+        ],
     ]
 
     return ",".join(filters)
 
 
 def build_video(theme: dict, media_path: Path, output_path: Path,
-                duration: int = 120, audio_path: Path | None = None) -> Path:
+                duration: int = 60, audio_path: Path | None = None,
+                slot: int = 0) -> Path:
     """
     Build a relaxation Short video.
 
@@ -271,10 +317,11 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
         theme:       Variant dict (name, subtitle, category_id, audio_lavfi, …)
         media_path:  Source video (.mp4) or image (.jpg/.png)
         output_path: Destination .mp4
-        duration:    Seconds (default 120)
+        duration:    Seconds (default 60 — proper YouTube Shorts length)
         audio_path:  Optional real audio file to loop
+        slot:        Daily slot index (0-3) used to rotate hook text per post
     """
-    vf       = _build_vf(theme, duration)
+    vf       = _build_vf(theme, duration, slot)
     is_video = media_path.suffix.lower() == ".mp4"
     media_str = str(media_path.resolve()).replace("\\", "/")
     out_str   = str(output_path.resolve()).replace("\\", "/")

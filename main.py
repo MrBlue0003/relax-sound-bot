@@ -249,7 +249,7 @@ def main() -> int:
         safe_name = variant["name"].lower().replace(" ", "_")
         output_path = work_dir / f"relax_{timestamp}_{safe_name}.mp4"
         build_video(variant, media_path, output_path, duration=config.VIDEO_DURATION,
-                    audio_path=audio_path)
+                    audio_path=audio_path, slot=slot_in_day)
 
         video_id = upload_video(output_path, variant)
 
