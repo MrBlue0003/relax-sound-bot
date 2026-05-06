@@ -33,6 +33,7 @@ from scripts.fetch_media import (
 )
 from scripts.assemble import build_video
 from scripts.upload import upload_video
+from scripts.github_log import pull_log, push_log
 import scripts.monthly_compilation as monthly_compilation
 
 
@@ -192,6 +193,10 @@ def main() -> int:
         logger.error("PIXABAY_API_KEY not set in .env")
         return 1
 
+    # Pull latest upload log from GitHub so rotation/dedup works across runs
+    # (Railway containers are ephemeral — local logs/ is lost on restart)
+    pull_log(config.UPLOADED_FILE)
+
     try:
         # Allow workflow_dispatch to force a specific variant
         force_id = os.getenv("FORCE_VARIANT_ID", "").strip()
@@ -252,6 +257,9 @@ def main() -> int:
                     audio_path=audio_path, slot=slot_in_day)
 
         video_id = upload_video(output_path, variant)
+
+        # Push updated log to GitHub for persistence across Railway runs
+        push_log(config.UPLOADED_FILE)
 
         elapsed = (datetime.now(timezone.utc) - start).total_seconds()
         logger.info("=" * 60)
