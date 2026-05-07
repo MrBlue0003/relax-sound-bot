@@ -158,8 +158,8 @@ def main() -> int:
             media_path=media_path,
             audio_path=audio_path,
             output_path=output_path,
-            duration=duration_s,
             title=variant["title"],
+            category=variant.get("category", ""),
         )
 
         # Upload

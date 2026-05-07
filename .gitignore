@@ -3,6 +3,7 @@ client_secrets.json
 assets/*.jpg
 assets/*.png
 assets/*.mp4
+!assets/whisk_intro.mp4
 output/
 logs/*.log
 __pycache__/
