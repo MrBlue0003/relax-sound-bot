@@ -6,6 +6,6 @@ dockerfilePath = "Dockerfile"
 # 4x/day: 06:00, 10:00, 14:00, 18:00 UTC
 # = 09:00, 13:00, 17:00, 21:00 Bucharest (EEST)
 cronSchedule = "0 6,10,14,18 * * *"
-startCommand = "python -u main.py"
+startCommand = "python -u run.py"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
