@@ -138,23 +138,24 @@ _UNIVERSAL_HASHTAGS = (
     "#AmbientMusic #Tranquil #NatureTherapy #HealingMusic #YogaMusic "
     "#BreathingExercise #MindfulLiving #PositiveVibes #GoodVibesOnly "
     "#TikTokRelax #Trending #Viral #SleepTok #MeditationTok #ASMRCommunity "
-    "#RelaxationStation #ChillZone #SoundTherapy #NatureLovers #Peaceful"
+    "#RelaxationStation #ChillZone #SoundTherapy #NatureLovers #Peaceful "
+    "#BlackScreen #BlackScreenSounds #SleepBlackScreen #DarkScreen"
 )
 
 
 # ── Per-category metadata ─────────────────────────────────────────────────────
 _CAT_EMOJI = {
-    "rain":        "🌧️",
-    "forest":      "🌿",
-    "ocean":       "🌊",
-    "fireplace":   "🔥",
-    "meditation":  "🧘",
-    "deep_sleep":  "🌙",
-    "white_noise": "💤",
+    "rain":        "\U0001f327️",
+    "forest":      "\U0001f33f",
+    "ocean":       "\U0001f30a",
+    "fireplace":   "\U0001f525",
+    "meditation":  "\U0001f9d8",
+    "deep_sleep":  "\U0001f319",
+    "white_noise": "\U0001f4a4",
     "coffee_shop": "☕",
 }
 
-# Benefit phrase used in title: "{emoji} {name} for {benefit} #Shorts"
+# Benefit phrase used in title
 _CAT_BENEFIT = {
     "rain":        "Deep Sleep",
     "forest":      "Focus & Calm",
@@ -177,64 +178,64 @@ _CAT_DESC_HOOKS = {
     "coffee_shop": "Get in the zone with the perfect study ambience.",
 }
 
-# Pinned comment per category — numbered poll format drives replies & watch time
+# Pinned comment per category
 _CAT_COMMENTS = {
     "rain":
-        "🌧️ What do you use rain sounds for?\n"
+        "\U0001f327️ What do you use rain sounds for?\n"
         "1️⃣ Fall asleep\n"
         "2️⃣ Study & focus\n"
         "3️⃣ Stress relief\n"
-        "👇 Drop your number below!\n\n"
-        "Follow for 4 new sounds every day 🔔",
+        "\U0001f447 Drop your number below!\n\n"
+        "Follow for 4 new sounds every day \U0001f514",
     "forest":
-        "🌿 When do you listen to nature sounds?\n"
+        "\U0001f33f When do you listen to nature sounds?\n"
         "1️⃣ While working\n"
         "2️⃣ Before sleep\n"
         "3️⃣ During meditation\n"
-        "👇 Comment your number!\n\n"
-        "Follow for daily relaxation sounds 🔔",
+        "\U0001f447 Comment your number!\n\n"
+        "Follow for daily relaxation sounds \U0001f514",
     "ocean":
-        "🌊 Ocean waves help you...\n"
+        "\U0001f30a Ocean waves help you...\n"
         "1️⃣ Fall asleep faster\n"
         "2️⃣ Focus & study\n"
         "3️⃣ Reduce anxiety\n"
-        "👇 Which one is you?\n\n"
-        "Follow for 4 new sounds every day 🔔",
+        "\U0001f447 Which one is you?\n\n"
+        "Follow for 4 new sounds every day \U0001f514",
     "fireplace":
-        "🔥 You're listening to this because...\n"
+        "\U0001f525 You're listening to this because...\n"
         "1️⃣ Getting cozy tonight\n"
         "2️⃣ Can't sleep\n"
         "3️⃣ Just want to relax\n"
-        "👇 Tell me below!\n\n"
-        "Follow for daily relaxation sounds 🔔",
+        "\U0001f447 Tell me below!\n\n"
+        "Follow for daily relaxation sounds \U0001f514",
     "meditation":
-        "🧘 How do you meditate?\n"
+        "\U0001f9d8 How do you meditate?\n"
         "1️⃣ With music or sound\n"
         "2️⃣ In total silence\n"
         "3️⃣ I'm just starting out\n"
-        "👇 Drop your number!\n\n"
-        "Follow for 4 new sounds every day 🔔",
+        "\U0001f447 Drop your number!\n\n"
+        "Follow for 4 new sounds every day \U0001f514",
     "deep_sleep":
-        "🌙 What keeps you awake at night?\n"
+        "\U0001f319 What keeps you awake at night?\n"
         "1️⃣ Anxiety & stress\n"
         "2️⃣ Racing thoughts\n"
         "3️⃣ Can't switch off\n"
-        "👇 You're not alone — comment below!\n\n"
-        "Follow for daily sleep sounds 🔔",
+        "\U0001f447 You're not alone — comment below!\n\n"
+        "Follow for daily sleep sounds \U0001f514",
     "white_noise":
-        "💤 White noise helps you...\n"
+        "\U0001f4a4 White noise helps you...\n"
         "1️⃣ Focus & study\n"
         "2️⃣ Block out distractions\n"
         "3️⃣ Fall asleep faster\n"
-        "👇 Which one?\n\n"
-        "Follow for 4 new sounds every day 🔔",
+        "\U0001f447 Which one?\n\n"
+        "Follow for 4 new sounds every day \U0001f514",
     "coffee_shop":
         "☕ Where do you study best?\n"
         "1️⃣ Coffee shop\n"
         "2️⃣ Library\n"
         "3️⃣ At home with ambience\n"
-        "👇 Drop your answer below!\n\n"
-        "Follow for daily focus sounds 🔔",
+        "\U0001f447 Drop your answer below!\n\n"
+        "Follow for daily focus sounds \U0001f514",
 }
 
 
@@ -249,7 +250,7 @@ def _auto_like(youtube, video_id: str) -> None:
 
 def _post_comment(youtube, video_id: str, category_id: str) -> None:
     """Post a channel-owner comment on the video to drive engagement."""
-    text = _CAT_COMMENTS.get(category_id, "🔔 Follow for daily relaxation sounds! 👇")
+    text = _CAT_COMMENTS.get(category_id, "\U0001f514 Follow for daily relaxation sounds! \U0001f447")
     try:
         resp = youtube.commentThreads().insert(
             part="snippet",
@@ -265,7 +266,6 @@ def _post_comment(youtube, video_id: str, category_id: str) -> None:
         comment_id = resp["snippet"]["topLevelComment"]["id"]
         logger.info(f"Comment posted: {comment_id}")
     except HttpError as e:
-        # Non-fatal — video still uploaded successfully
         logger.warning(f"Could not post comment: {e}")
 
 
@@ -280,7 +280,7 @@ def upload_video(video_path: Path, variant: dict) -> str:
     subtitle    = variant.get("subtitle", "")
     tags_base   = variant.get("tags", [])
     category_id = variant.get("category_id", "")
-    emoji       = _CAT_EMOJI.get(category_id, "🎵")
+    emoji       = _CAT_EMOJI.get(category_id, "\U0001f3b5")
     benefit     = _CAT_BENEFIT.get(category_id, "Relaxation")
     hook_line   = _CAT_DESC_HOOKS.get(category_id, "Relax and unwind.")
 
@@ -291,12 +291,12 @@ def upload_video(video_path: Path, variant: dict) -> str:
             "relax", "meditation", "ambient sounds", "nature sounds",
             "stress relief", "calm music", "chillout", "focus music",
             "sleep music", "background music", "white noise", "sound therapy",
+            "black screen", "black screen sounds", "sleep black screen",
         ]
     ))
 
-    # Title format: "{emoji} {name} for {benefit} #Shorts"
-    # More searchable than old "name • subtitle" format
-    title = f"{emoji} {name} for {benefit} #Shorts"
+    # Title: emoji + name + Black Screen badge + benefit + #Shorts
+    title = f"{emoji} {name} | \U0001f5a4 Black Screen | {benefit} #Shorts"
     if len(title) > 100:
         title = title[:97] + "…"
 
@@ -308,9 +308,11 @@ def upload_video(video_path: Path, variant: dict) -> str:
     description = (
         f"{emoji} {name}\n"
         f"{hook_line}\n\n"
-        f"🔊 Turn on sound for the full experience!\n"
-        f"🌿 Subscribe for daily relaxation sounds 🔔\n"
-        f"🆕 4 new videos every day!\n\n"
+        f"\U0001f5a4 Black Screen — screen fades to black after 5 seconds, "
+        f"perfect for sleep and relaxation with lights off.\n"
+        f"\U0001f50a Turn on sound for the full experience!\n"
+        f"\U0001f33f Subscribe for daily relaxation sounds \U0001f514\n"
+        f"\U0001f195 4 new videos every day!\n\n"
         f"Perfect for: sleep, study, meditation, yoga, focus, stress relief & relaxation.\n\n"
         f"---\n"
         f"{hashtags}"
@@ -389,13 +391,13 @@ def upload_compilation(video_path: Path, month_str: str, youtube=None) -> str:
 
     title = f"Best of {month_str} \U0001f33f | Relax Sound Compilation"
     if len(title) > 100:
-        title = title[:97] + "\u2026"
+        title = title[:97] + "…"
 
     description = (
-        f"\U0001f3b5 Best of {month_str} \u2014 top relaxing sounds of the month!\n\n"
+        f"\U0001f3b5 Best of {month_str} — top relaxing sounds of the month!\n\n"
         "Our most-watched relaxation videos in one place:\n"
-        "\U0001f327 Rain sounds \u2022 \U0001f9d8 Meditation tones \u2022 \U0001f30a Ocean waves\n"
-        "\U0001f333 Forest ambience \u2022 \U0001f525 Fireplace crackling \u2022 \U0001f634 Deep sleep sounds\n\n"
+        "\U0001f327 Rain sounds • \U0001f9d8 Meditation tones • \U0001f30a Ocean waves\n"
+        "\U0001f333 Forest ambience • \U0001f525 Fireplace crackling • \U0001f634 Deep sleep sounds\n\n"
         "#relaxingsounds #sleepsounds #ASMR #meditation #relaxation #compilation\n\n"
         "\U0001f514 Subscribe for daily relaxation sounds.\n"
         "\U0001f50a Turn on sound for the full experience!"

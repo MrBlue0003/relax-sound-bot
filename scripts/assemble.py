@@ -9,6 +9,7 @@ Visual design:
   • Category label badge      — top-right pill for instant visual ID
   • End-screen CTA (last 5s)  — "Follow + Save" drives algorithm signals
   • Slot-based hook rotation  — 3 hooks/category so each post feels fresh
+  • Black screen fade         — fades to black at 5s for sleep-friendly viewing
 """
 import logging
 import platform
@@ -62,6 +63,11 @@ CAT_HOOKS: dict[str, list[str]] = {
 }
 _HOOK_DEFAULT = "Need to relax?"
 
+# Fade to black timing constants
+_FADE_START  = 5   # seconds — nature footage visible before fade begins
+_FADE_DUR    = 3   # seconds — fade duration (black screen complete at _FADE_START + _FADE_DUR)
+_BLACK_START = _FADE_START + _FADE_DUR  # = 8s — when black screen is fully active
+
 
 def _detect_font() -> str:
     """Return ffmpeg-escaped font path for current OS."""
@@ -84,8 +90,8 @@ FONT_PATH = _detect_font()
 def esc(s: str) -> str:
     """Escape text for ffmpeg drawtext."""
     return (s.replace("\\", "\\\\")
-             .replace("'",  "\u2019")   # curly apostrophe — safe in filter
-             .replace('"',  "\u201c")
+             .replace("'",  "’")   # curly apostrophe — safe in filter
+             .replace('"',  "“")
              .replace(":",  "\\:")
              .replace("[",  "\\[")
              .replace("]",  "\\]")
@@ -101,7 +107,7 @@ def _run_ffmpeg(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
     if platform.system() == "Windows":
         bat = cwd / "_ffmpeg_run.bat"
         cmd_line = " ".join(
-            f'"{a}"' if (" " in a and not a.startswith('"')) else a
+            f'"{ a}"' if (" " in a and not a.startswith('"')) else a
             for a in args
         )
         bat.write_text(f'@echo off\ncd /d "{cwd}"\n{cmd_line}\n', encoding="utf-8")
@@ -147,26 +153,24 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
     """
     Build the full ffmpeg -vf filter chain.
 
-    Layout (1080×1920):
-      y=0–90    : HOOK TEXT (0-3s) → END-SCREEN CTA (last 5s) — same banner zone
-      y=90–1480 : clean ambient video (no overlays)
-      y=0–56    : category label badge, top-right pill (appears after hook fades)
-      y=1480–1920: bottom zone
-          1480–1920: fake gradient (3 dark layers)
-          1480–1920: 10-px left accent stripe
-          1555     : NAME   (fontsize 84, white, bold)
-          1652     : thin separator line
-          1668     : subtitle (fontsize 42, white 92%)
-          1855–1864: progress bar track (dark)
-          1855–1864: progress bar fill (animated, category colour)
-          1873     : "LOOP" badge text
+    Layout (1080x1920):
+      0-5s    : nature footage visible (hook text in top banner)
+      5-8s    : smooth fade to black
+      8s+     : black screen with centered name/subtitle + bottom badge
+
+      y=0-90    : HOOK TEXT (0-3s) — same banner zone
+      y=90-1480 : clean ambient video (no overlays)
+      y=0-56    : category label badge, top-right pill (after hook fades)
+      y=1480-1920: bottom zone
+          gradient, accent stripe, name, subtitle, loop badge (0-8s)
+      centered  : name + subtitle on black screen (8s+)
     """
     font  = FONT_PATH
     cat   = theme.get("category_id", "")
     color = CAT_COLORS.get(cat, _CAT_COLOR_DEFAULT)
     grade = CAT_GRADE.get(cat, _GRADE_DEFAULT)
 
-    # Slot-based hook rotation — pick from list; fall back to theme override or default
+    # Slot-based hook rotation
     hooks_opt = CAT_HOOKS.get(cat)
     if isinstance(hooks_opt, list):
         hook_raw = hooks_opt[slot % len(hooks_opt)]
@@ -182,13 +186,15 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
     # Category label badge text (ASCII only — emoji unsupported in drawtext)
     cat_label = cat.upper().replace("_", " ")
 
-    # Dynamic loop label: "1 MIN LOOP", "2 MIN LOOP", or "60S LOOP" etc.
+    # Dynamic loop label
     if duration >= 60 and duration % 60 == 0:
         loop_label = f"{duration // 60} MIN LOOP"
     elif duration >= 60:
         loop_label = f"{duration // 60}:{duration % 60:02d} LOOP"
     else:
         loop_label = f"{duration}S LOOP"
+
+    bs = _BLACK_START  # shorthand: 8
 
     filters = [
         # ── Canvas ──────────────────────────────────────────────────────────
@@ -200,12 +206,15 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         grade,
 
         # ── Vignette — subtle dark edge, pulls focus to centre ───────────────
-        # angle=PI/5 ≈ 36° — gentle, not cinematic-heavy
         "vignette=angle=PI/5:mode=forward",
 
         # ── Sharpening — luma 0.8, chroma 0.4 (crisp on mobile screens) ─────
         "unsharp=luma_msize_x=5:luma_msize_y=5:luma_amount=0.8"
         ":chroma_msize_x=3:chroma_msize_y=3:chroma_amount=0.4",
+
+        # ── Fade to black — starts at 5s, complete at 8s ────────────────────
+        # After t=8s the output stays black; text overlays are drawn on top.
+        f"fade=t=out:st={_FADE_START}:d={_FADE_DUR}",
 
         # ── Hook banner (0–3 s) ──────────────────────────────────────────────
         f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.90:t=fill"
@@ -217,7 +226,7 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         # Thin bottom accent on hook box
         f"drawbox=x=0:y=188:w={WIDTH}:h=7:color={color}:t=fill"
         f":enable='between(t,0,2.5)'",
-        # Hook text — 3-step alpha fade (full → dim → ghost)
+        # Hook text — 3-step alpha fade
         f"drawtext=fontfile='{font}':text='{hook}'"
         f":fontsize=74:fontcolor=white:x=(w-text_w)/2:y=62"
         f":borderw=3:bordercolor=black@0.55"
@@ -231,32 +240,38 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f":borderw=0:bordercolor=black@0.00"
         f":enable='between(t,2.8,3.0)'",
 
-        # ── Bottom gradient (3 overlapping semi-transparent layers) ─────────
-        f"drawbox=x=0:y=1480:w={WIDTH}:h=440:color=black@0.28:t=fill",
-        f"drawbox=x=0:y=1610:w={WIDTH}:h=310:color=black@0.52:t=fill",
-        f"drawbox=x=0:y=1740:w={WIDTH}:h=180:color=black@0.78:t=fill",
+        # ── Bottom gradient (visible during nature footage, 0-8s) ─────────
+        f"drawbox=x=0:y=1480:w={WIDTH}:h=440:color=black@0.28:t=fill"
+        f":enable='lt(t,{bs})'",
+        f"drawbox=x=0:y=1610:w={WIDTH}:h=310:color=black@0.52:t=fill"
+        f":enable='lt(t,{bs})'",
+        f"drawbox=x=0:y=1740:w={WIDTH}:h=180:color=black@0.78:t=fill"
+        f":enable='lt(t,{bs})'",
 
-        # ── Left category accent stripe ──────────────────────────────────────
-        f"drawbox=x=0:y=1480:w=10:h=440:color={color}:t=fill",
+        # ── Left category accent stripe (nature phase only) ──────────────────
+        f"drawbox=x=0:y=1480:w=10:h=440:color={color}:t=fill"
+        f":enable='lt(t,{bs})'",
 
-        # ── Sound name ───────────────────────────────────────────────────────
+        # ── Sound name (bottom, nature phase) ───────────────────────────────
         f"drawtext=fontfile='{font}':text='{name}'"
         f":fontsize=84:fontcolor=white:x=(w-text_w)/2:y=1555"
-        f":borderw=3:bordercolor={color}@0.40",
+        f":borderw=3:bordercolor={color}@0.40"
+        f":enable='lt(t,{bs})'",
 
-        # ── Thin separator line (category colour, between name and subtitle) ──
-        f"drawbox=x=80:y=1652:w={WIDTH - 160}:h=1:color={color}@0.50:t=fill",
+        # ── Thin separator line ──────────────────────────────────────────────
+        f"drawbox=x=80:y=1652:w={WIDTH - 160}:h=1:color={color}@0.50:t=fill"
+        f":enable='lt(t,{bs})'",
 
-        # ── Subtitle ─────────────────────────────────────────────────────────
+        # ── Subtitle (bottom, nature phase) ─────────────────────────────────
         f"drawtext=fontfile='{font}':text='{sub}'"
         f":fontsize=42:fontcolor=white@0.93:x=(w-text_w)/2:y=1668"
-        f":borderw=2:bordercolor=black@0.70",
+        f":borderw=2:bordercolor=black@0.70"
+        f":enable='lt(t,{bs})'",
 
-        # ── Loop badge ────────────────────────────────────────────────────────
-        # Progress bar removed — a filling bar is an obvious "ending soon" signal
-        # that breaks seamless loop illusion. Static badge sets expectations instead.
+        # ── Loop badge (nature phase) ──────────────────────────────────────
         f"drawtext=fontfile='{font}':text='{loop_label}'"
-        f":fontsize=28:fontcolor=white@0.55:x=(w-text_w)/2:y=1873",
+        f":fontsize=28:fontcolor=white@0.55:x=(w-text_w)/2:y=1873"
+        f":enable='lt(t,{bs})'",
 
         # ── Watermark — bottom-right, very subtle ─────────────────────────────
         f"drawtext=fontfile='{font}':text='Relax Sound'"
@@ -264,7 +279,6 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f":borderw=1:bordercolor=black@0.15",
 
         # ── Category label badge — top-right pill (visible after hook fades) ──
-        # Dark pill box: fixed width covers longest label ("WHITE NOISE" / "COFFEE SHOP")
         f"drawbox=x={WIDTH - 210}:y=8:w=202:h=50:color=black@0.62:t=fill"
         f":enable='between(t,3.1,{duration})'",
         f"drawtext=fontfile='{font}':text='{cat_label}'"
@@ -273,9 +287,22 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f":borderw=1:bordercolor=black@0.35"
         f":enable='between(t,3.1,{duration})'",
 
-        # ── End-screen CTA removed ─────────────────────────────────────────────
-        # Showing "Follow + Save" in the last 5s signals the video is ending,
-        # breaking seamless loop perception. Omit for perfect loop experience.
+        # ── Black screen: centered name (appears after fade completes) ────────
+        f"drawtext=fontfile='{font}':text='{name}'"
+        f":fontsize=80:fontcolor=white@0.90:x=(w-text_w)/2:y=(h-text_h)/2-80"
+        f":borderw=2:bordercolor=black@0.20"
+        f":enable='gte(t,{bs})'",
+
+        # ── Black screen: centered subtitle ──────────────────────────────────
+        f"drawtext=fontfile='{font}':text='{sub}'"
+        f":fontsize=44:fontcolor=white@0.70:x=(w-text_w)/2:y=(h-text_h)/2+10"
+        f":borderw=1:bordercolor=black@0.15"
+        f":enable='gte(t,{bs})'",
+
+        # ── Black screen: small 'BLACK SCREEN' badge at bottom ────────────────
+        f"drawtext=fontfile='{font}':text='BLACK SCREEN'"
+        f":fontsize=24:fontcolor=white@0.30:x=(w-text_w)/2:y=h-60"
+        f":enable='gte(t,{bs})'",
     ]
 
     return ",".join(filters)
@@ -362,7 +389,6 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
 
     if audio_path and audio_path.exists():
         # ── Case 1: real audio file (birds, rain, fire…) ─────────────────────
-        # Source is infinite via -stream_loop -1, so no aloop needed in filter.
         audio_str = str(audio_path.resolve()).replace("\\", "/")
         logger.info(f"Using real audio: {audio_path.name}")
         input_args = (
@@ -384,7 +410,6 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
 
     elif is_video and _video_has_audio(media_path):
         # ── Case 2: video has usable original audio ───────────────────────────
-        # [0:a] from -stream_loop -1 is already infinite — aloop not needed.
         logger.info("Using video's own audio")
         audio_flt = _seamless_audio_filter("[0:a]", duration, CF, volume=2.5)
         ffmpeg_args = [
@@ -400,7 +425,6 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
 
     elif is_video:
         # ── Case 3: video but mute → lavfi ───────────────────────────────────
-        # Lavfi generates continuous audio — no looping needed, volume=1.0.
         logger.info("Video mute — lavfi fallback")
         audio_flt = _seamless_audio_filter("[1:a]", duration, CF, volume=1.0)
         ffmpeg_args = [
