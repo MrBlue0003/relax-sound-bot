@@ -252,23 +252,11 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f":fontsize=42:fontcolor=white@0.93:x=(w-text_w)/2:y=1668"
         f":borderw=2:bordercolor=black@0.70",
 
-        # ── Progress bar track (full width, dark) ────────────────────────────
-        f"drawbox=x=0:y=1855:w={WIDTH}:h=9:color=0x111111@0.85:t=fill",
-
-        # ── Progress bar fill — 30 stepped segments ──────────────────────────
-        # NOTE: in drawbox, the `t` parameter = thickness (not time!).
-        # Time-based animation must use enable='gte(t,X)' where `t` IS time.
-        *[
-            f"drawbox=x={i * (WIDTH // 30)}:y=1855"
-            f":w={WIDTH // 30 + 1}:h=9"
-            f":color={color}:t=fill"
-            f":enable='gte(t,{duration * i / 30:.2f})'"
-            for i in range(30)
-        ],
-
         # ── Loop badge ────────────────────────────────────────────────────────
+        # Progress bar removed — a filling bar is an obvious "ending soon" signal
+        # that breaks seamless loop illusion. Static badge sets expectations instead.
         f"drawtext=fontfile='{font}':text='{loop_label}'"
-        f":fontsize=28:fontcolor=white@0.60:x=(w-text_w)/2:y=1873",
+        f":fontsize=28:fontcolor=white@0.55:x=(w-text_w)/2:y=1873",
 
         # ── Watermark — bottom-right, very subtle ─────────────────────────────
         f"drawtext=fontfile='{font}':text='Relax Sound'"
@@ -285,52 +273,87 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f":borderw=1:bordercolor=black@0.35"
         f":enable='between(t,3.1,{duration})'",
 
-        # ── End-screen CTA — reuses hook banner zone for last 5 seconds ───────
-        # Drives follows + saves — the two biggest Shorts algorithm signals.
-        *[
-            f"drawbox=x=0:y=0:w={WIDTH}:h=90:color={color}@0.90:t=fill"
-            f":enable='gte(t,{max(duration - 5, 4)})'",
-            f"drawbox=x=0:y=83:w={WIDTH}:h=7:color=black@0.55:t=fill"
-            f":enable='gte(t,{max(duration - 5, 4)})'",
-            f"drawtext=fontfile='{font}':text='Follow for daily calm  +  Save for tonight'"
-            f":fontsize=34:fontcolor=white:x=(w-text_w)/2:y=24"
-            f":borderw=2:bordercolor=black@0.50"
-            f":enable='gte(t,{max(duration - 5, 4)})'",
-        ],
+        # ── End-screen CTA removed ─────────────────────────────────────────────
+        # Showing "Follow + Save" in the last 5s signals the video is ending,
+        # breaking seamless loop perception. Omit for perfect loop experience.
     ]
 
     return ",".join(filters)
 
 
+def _seamless_audio_filter(src_label: str, duration: int, cf: int = 3,
+                            volume: float = 2.5, has_aloop: bool = False) -> str:
+    """Return a filter_complex fragment that produces exactly `duration` seconds
+    of seamlessly-looping audio from `src_label`.
+
+    Strategy — crossfade at the loop boundary:
+      1. Pull duration+cf seconds from the (infinite) source.
+      2. Split into two streams:
+           a_main  = first `duration` seconds (the full playback)
+           a_start = seconds [duration .. duration+cf]  which, because the
+                     source loops, equals the FIRST cf seconds of the clip.
+      3. acrossfade(d=cf): fades the last cf seconds of a_main into the first
+         cf seconds of a_start.
+      Output = duration + cf - cf = duration seconds. ✓
+      At t=duration the audio has fully transitioned to "beginning of clip",
+      so when YouTube replays from t=0 the listener hears no jump.
+
+    Args:
+        src_label:  ffmpeg pad label, e.g. "[1:a]"
+        duration:   desired output duration in seconds
+        cf:         crossfade duration in seconds (default 3)
+        volume:     volume multiplier (default 2.5; pass 1.0 for lavfi sources)
+        has_aloop:  if True, prepend aloop filter (needed when src is a finite
+                    video audio stream — not needed for stream_loop/-1 inputs)
+    """
+    aloop_prefix = "aloop=loop=-1:size=2e+09," if has_aloop else ""
+    vol_filter   = f"volume={volume}," if volume != 1.0 else ""
+    return (
+        f"{src_label}"
+        f"{aloop_prefix}"
+        f"atrim=duration={duration + cf},"
+        f"asetpts=PTS-STARTPTS,"
+        f"{vol_filter}"
+        f"asplit=2[_a1][_a2];"
+        f"[_a1]atrim=0:{duration},asetpts=PTS-STARTPTS[_amain];"
+        f"[_a2]atrim={duration}:{duration + cf},asetpts=PTS-STARTPTS[_astart];"
+        f"[_amain][_astart]acrossfade=d={cf}:c1=tri:c2=tri[aout]"
+    )
+
+
 def build_video(theme: dict, media_path: Path, output_path: Path,
                 duration: int = 60, audio_path: Path | None = None,
-                slot: int = 0) -> Path:
+                slot: int = 0, crossfade_dur: int = 3) -> Path:
     """
-    Build a relaxation Short video.
+    Build a relaxation Short video with seamless audio loop.
 
     Audio priority:
       1. audio_path file provided → loop that file (real birds/rain/etc.)
       2. video with non-silent audio → use original video audio
       3. video without audio / image → lavfi synthetic fallback
 
+    The audio crossfades at the loop boundary so the end blends imperceptibly
+    into the beginning — no fade-out, no fade-in, no audible seam.
+
     Args:
-        theme:       Variant dict (name, subtitle, category_id, audio_lavfi, …)
-        media_path:  Source video (.mp4) or image (.jpg/.png)
-        output_path: Destination .mp4
-        duration:    Seconds (default 60 — proper YouTube Shorts length)
-        audio_path:  Optional real audio file to loop
-        slot:        Daily slot index (0-3) used to rotate hook text per post
+        theme:         Variant dict (name, subtitle, category_id, audio_lavfi, …)
+        media_path:    Source video (.mp4) or image (.jpg/.png)
+        output_path:   Destination .mp4
+        duration:      Output duration in seconds
+        audio_path:    Optional real audio file to loop
+        slot:          Daily slot index (0-3) used to rotate hook text per post
+        crossfade_dur: Seconds of crossfade at the loop boundary (default 3)
     """
-    vf       = _build_vf(theme, duration, slot)
-    is_video = media_path.suffix.lower() == ".mp4"
+    CF = crossfade_dur
+
+    vf        = _build_vf(theme, duration, slot)
+    is_video  = media_path.suffix.lower() == ".mp4"
     media_str = str(media_path.resolve()).replace("\\", "/")
     out_str   = str(output_path.resolve()).replace("\\", "/")
 
     # Lavfi fallback (used only when no real audio is available)
     audio_lavfi = theme.get("audio_lavfi", "anoisesrc=color=brown,volume=4.0")
 
-    # fast preset + crf 26: ~30% smaller files, noticeably better visual quality
-    # than ultrafast; well within GitHub Actions limits for 60-second Shorts.
     encode = [
         "-c:v", "libx264", "-preset", "fast", "-crf", "26",
         "-c:a", "aac", "-b:a", "128k",
@@ -339,60 +362,55 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
 
     if audio_path and audio_path.exists():
         # ── Case 1: real audio file (birds, rain, fire…) ─────────────────────
+        # Source is infinite via -stream_loop -1, so no aloop needed in filter.
         audio_str = str(audio_path.resolve()).replace("\\", "/")
         logger.info(f"Using real audio: {audio_path.name}")
         input_args = (
             ["-stream_loop", "-1", "-i", media_str] if is_video
             else ["-loop", "1", "-i", media_str]
         )
+        audio_flt = _seamless_audio_filter("[1:a]", duration, CF, volume=2.5)
         ffmpeg_args = [
             "ffmpeg", "-y",
             *input_args,
             "-stream_loop", "-1", "-i", audio_str,
-            "-t", str(duration),
             "-filter_complex",
-            f"[0:v]{vf}[vout];"
-            f"[1:a]atrim=duration={duration},"
-            f"volume=2.5,"
-            f"afade=t=in:st=0:d=2,"
-            f"afade=t=out:st={duration - 3}:d=3[aout]",
+            f"[0:v]{vf}[vout];{audio_flt}",
             "-map", "[vout]", "-map", "[aout]",
+            "-t", str(duration),
             *encode,
             out_str,
         ]
 
     elif is_video and _video_has_audio(media_path):
         # ── Case 2: video has usable original audio ───────────────────────────
+        # [0:a] from -stream_loop -1 is already infinite — aloop not needed.
         logger.info("Using video's own audio")
+        audio_flt = _seamless_audio_filter("[0:a]", duration, CF, volume=2.5)
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-stream_loop", "-1", "-i", media_str,
-            "-t", str(duration),
             "-filter_complex",
-            f"[0:v]{vf}[vout];"
-            f"[0:a]aloop=loop=-1:size=2e+09,"
-            f"atrim=duration={duration},"
-            f"volume=2.5,"
-            f"afade=t=in:st=0:d=2,"
-            f"afade=t=out:st={duration - 3}:d=3[aout]",
+            f"[0:v]{vf}[vout];{audio_flt}",
             "-map", "[vout]", "-map", "[aout]",
+            "-t", str(duration),
             *encode,
             out_str,
         ]
 
     elif is_video:
         # ── Case 3: video but mute → lavfi ───────────────────────────────────
+        # Lavfi generates continuous audio — no looping needed, volume=1.0.
         logger.info("Video mute — lavfi fallback")
+        audio_flt = _seamless_audio_filter("[1:a]", duration, CF, volume=1.0)
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-stream_loop", "-1", "-i", media_str,
             "-f", "lavfi", "-i", audio_lavfi,
-            "-t", str(duration),
             "-filter_complex",
-            f"[0:v]{vf}[vout];"
-            f"[1:a]afade=t=in:st=0:d=2,"
-            f"afade=t=out:st={duration - 3}:d=3[aout]",
+            f"[0:v]{vf}[vout];{audio_flt}",
             "-map", "[vout]", "-map", "[aout]",
+            "-t", str(duration),
             *encode,
             out_str,
         ]
@@ -400,16 +418,15 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     else:
         # ── Case 4: still image + lavfi ──────────────────────────────────────
         logger.info("Image + lavfi fallback")
+        audio_flt = _seamless_audio_filter("[1:a]", duration, CF, volume=1.0)
         ffmpeg_args = [
             "ffmpeg", "-y",
             "-loop", "1", "-i", media_str,
             "-f", "lavfi", "-i", audio_lavfi,
-            "-t", str(duration),
             "-filter_complex",
-            f"[0:v]{vf}[vout];"
-            f"[1:a]afade=t=in:st=0:d=2,"
-            f"afade=t=out:st={duration - 3}:d=3[aout]",
+            f"[0:v]{vf}[vout];{audio_flt}",
             "-map", "[vout]", "-map", "[aout]",
+            "-t", str(duration),
             *encode,
             "-shortest",
             out_str,
