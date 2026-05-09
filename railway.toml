@@ -3,9 +3,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# 4x/day: 06:00, 10:00, 14:00, 18:00 UTC
-# = 09:00, 13:00, 17:00, 21:00 Bucharest (EEST)
-cronSchedule = "0 6,10,14,18 * * *"
+# 4x/day targeting peak sleep/relax listening hours across timezones:
+# 20:00 UTC = 22h EU | 22:00 UTC = 11 PM UK | 01:00 UTC = 9 PM US East | 04:00 UTC = 9 PM US West
+cronSchedule = "0 20,22,1,4 * * *"
 startCommand = "python -u run.py"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
