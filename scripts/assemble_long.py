@@ -77,6 +77,68 @@ def _esc(s: str) -> str:
              .replace("\n", " "))
 
 
+def _probe_audio_duration(path: Path) -> float:
+    """Return audio duration in seconds via ffprobe. Returns 0 on failure."""
+    try:
+        r = subprocess.run(
+            ["ffprobe", "-v", "quiet", "-show_entries", "format=duration",
+             "-of", "csv=p=0", str(path)],
+            capture_output=True, text=True, timeout=15,
+        )
+        return float(r.stdout.strip())
+    except Exception:
+        return 0.0
+
+
+def _make_seamless_loop(audio_path: Path, work_dir: Path, xfade: float = 2.0) -> Path:
+    """Pre-bake a seamlessly-looping version of a short audio file.
+
+    For files shorter than 180 s, the loop point is a hard cut that becomes
+    audible after many repetitions.  This function creates a same-duration
+    output whose *end* crossfades into its *beginning*, so that stream_loop -1
+    plays it without any click at the splice point.
+
+    Strategy
+    --------
+    Split the source into three slices:
+      body  = [0, dur-xfade)          → plays normally
+      tail  = [dur-xfade, dur)        → end of file
+      head  = [0, xfade)              → beginning of file
+    Crossfade tail→head to create a smooth transition region, then concat:
+      baked = body + crossfade(tail, head)
+    Duration stays ≈ dur.  When -stream_loop replays the baked file, the
+    last sample fades toward the beginning, matching iteration N+1's start.
+    """
+    dur = _probe_audio_duration(audio_path)
+    if dur <= 0 or dur >= 180:
+        return audio_path
+
+    xfade = min(xfade, dur * 0.12)
+    out = work_dir / f"loop_seamless_{audio_path.stem}.mp3"
+
+    fc = (
+        f"[0:a]asplit=3[a1][a2][a3];"
+        f"[a1]atrim=0:{dur - xfade:.3f},asetpts=PTS-STARTPTS[body];"
+        f"[a2]atrim={dur - xfade:.3f}:{dur:.3f},asetpts=PTS-STARTPTS[tail];"
+        f"[a3]atrim=0:{xfade:.3f},asetpts=PTS-STARTPTS[head];"
+        f"[tail][head]acrossfade=d={xfade:.3f}:c1=tri:c2=tri[xf];"
+        f"[body][xf]concat=n=2:v=0:a=1[aout]"
+    )
+    cmd = [
+        "ffmpeg", "-y", "-i", str(audio_path),
+        "-filter_complex", fc,
+        "-map", "[aout]",
+        "-codec:a", "libmp3lame", "-q:a", "2",
+        str(out),
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+    if r.returncode != 0 or not out.exists():
+        logger.warning(f"Seamless loop prep failed — using original: {audio_path.name}")
+        return audio_path
+    logger.info(f"Seamless loop baked: {out.name} ({dur:.1f}s, xfade={xfade:.1f}s)")
+    return out
+
+
 def _is_video(p: Path) -> bool:
     return p.suffix.lower() in (".mp4", ".mov", ".avi", ".webm", ".mkv")
 
@@ -245,6 +307,7 @@ def build_long_video(
 
     # ── Case 1: explicit real audio file ─────────────────────────────────────
     if audio_path and audio_path.exists():
+        audio_path = _make_seamless_loop(audio_path, output_path.parent)
         audio_str = str(audio_path.resolve()).replace("\\", "/")
         logger.info(f"Audio: {audio_path.name} (looped for {TOTAL_DURATION}s)")
 
