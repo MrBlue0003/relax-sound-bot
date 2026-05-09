@@ -315,9 +315,9 @@
           "name": "Pink Noise",
           "subtitle": "for Deep Sleep",
           "video_queries": [
-            "pink sky sunrise",
-            "soft pink clouds",
-            "pastel sky gradient"
+            "calm bedroom dark",
+            "sleeping peaceful night",
+            "dark cozy room"
           ],
           "audio_lavfi": "anoisesrc=color=pink,volume=3.5",
           "tags": [
@@ -696,8 +696,7 @@
             "candles flickering",
             "candlelight dark"
           ],
-          "audio_file": "crackling_fire.mp3",
-          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=1500,highpass=f=70,volume=3.5",
+          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=600,highpass=f=50,volume=0.6",
           "tags": [
             "candle",
             "meditation",
@@ -717,6 +716,7 @@
           "name": "Morning Coffee Shop",
           "subtitle": "for Focus & Productivity",
           "video_queries": ["coffee shop morning", "cafe interior cozy", "coffee shop people working"],
+          "audio_file": "forest_birds.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=300,lowpass=f=4000,volume=2.5",
           "tags": ["coffee shop", "cafe", "study", "focus", "productivity", "lofi", "work"]
         },
@@ -725,6 +725,7 @@
           "name": "Rainy Café Ambience",
           "subtitle": "for Deep Focus",
           "video_queries": ["cafe rain window", "coffee shop rainy day", "cozy cafe rain"],
+          "audio_file": "rain.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=200,lowpass=f=5000,volume=3.0",
           "tags": ["cafe", "rain", "coffee shop", "focus", "study", "cozy", "ambience"]
         },
@@ -733,7 +734,7 @@
           "name": "Library Ambience",
           "subtitle": "for Study & Focus",
           "video_queries": ["library interior quiet", "library books study", "reading room library"],
-          "audio_lavfi": "anoisesrc=color=pink,highpass=f=400,lowpass=f=3000,volume=1.8",
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=500,lowpass=f=2500,volume=0.8",
           "tags": ["library", "study", "focus", "quiet", "reading", "concentration", "ambience"]
         },
         {
@@ -741,7 +742,7 @@
           "name": "Keyboard Typing ASMR",
           "subtitle": "for Focus & Productivity",
           "video_queries": ["keyboard typing close up", "mechanical keyboard", "typing computer"],
-          "audio_lavfi": "anoisesrc=color=white,highpass=f=1000,lowpass=f=8000,volume=2.0",
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=1500,lowpass=f=8000,volume=1.5",
           "tags": ["keyboard", "typing", "ASMR", "focus", "productivity", "study", "mechanical keyboard"]
         },
         {
@@ -749,6 +750,7 @@
           "name": "Evening Coffee Shop",
           "subtitle": "for Relaxation",
           "video_queries": ["evening cafe warm lights", "coffee shop night", "cozy cafe evening"],
+          "audio_file": "rain.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=250,lowpass=f=3500,volume=2.2",
           "tags": ["coffee shop", "evening", "relax", "cafe", "cozy", "calm", "ambience"]
         },
@@ -757,6 +759,7 @@
           "name": "Jazz Café Ambience",
           "subtitle": "for Work & Relaxation",
           "video_queries": ["jazz cafe bar", "cafe music live", "cozy bar ambience"],
+          "audio_file": "forest_rain.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=350,lowpass=f=4500,volume=2.8",
           "tags": ["jazz", "cafe", "bar", "work", "relax", "lounge", "ambience"]
         }
@@ -771,9 +774,9 @@
           "name": "Brown Noise",
           "subtitle": "for Deep Focus",
           "video_queries": [
-            "dark forest night",
-            "dark nature peaceful",
-            "night sky stars"
+            "person studying desk",
+            "laptop work focus",
+            "study desk minimal"
           ],
           "audio_lavfi": "anoisesrc=color=brown,volume=4.0",
           "tags": [
