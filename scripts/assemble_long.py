@@ -1,18 +1,19 @@
-"""assemble_long.py — Build 11-hour landscape ambient videos for Relax Sound.
+“””assemble_long.py — Build 11-hour landscape ambient videos for Relax Sound.
 
 Structure of every video:
-  [0:00 – 0:08]       Whisk intro  — branded title card (nicely edited)
+  [0:00 – 0:08]       Whisk intro  — branded clip played as-is (with its own audio)
   [0:08 – 4:00:08]    Content      — looping ambient video + audio (4 hours)
   [4:00:08 – 11:00:08] Black screen — audio continues, screen dark for sleep
+
+Audio transition: Whisk audio fades out over last 2 s → ambient fades in over 5 s.
 
 Encoding:
   • 1280×720, 5 fps (ambient — no detail lost at low fps)
   • ultrafast / CRF 28 (fast encode, small file, fine for ambient)
   • Black segment compresses to near-zero bytes in H.264
-"""
+“””
 
 import logging
-import platform
 import subprocess
 from pathlib import Path
 
@@ -21,60 +22,19 @@ logger = logging.getLogger(__name__)
 # ── Output canvas ─────────────────────────────────────────────────────────────
 OUT_W   = 1280
 OUT_H   = 720
-OUT_FPS = 5          # 5 fps — sufficient for ambient; greatly speeds up encode
+OUT_FPS = 5
 
 # ── Duration constants ────────────────────────────────────────────────────────
-INTRO_DURATION   = 8           # seconds — Whisk intro clip length
-CONTENT_DURATION = 4 * 3600   # 4 hours of visible ambient content
-BLACK_DURATION   = 7 * 3600   # 7 hours of black screen
+INTRO_DURATION   = 8
+CONTENT_DURATION = 4 * 3600
+BLACK_DURATION   = 7 * 3600
 TOTAL_DURATION   = INTRO_DURATION + CONTENT_DURATION + BLACK_DURATION  # 39 608 s
 
 # ── Encoding ──────────────────────────────────────────────────────────────────
-VIDEO_PRESET  = "ultrafast"
+VIDEO_PRESET  = “ultrafast”
 VIDEO_CRF     = 28
-AUDIO_BITRATE = "128k"
+AUDIO_BITRATE = “128k”
 AUDIO_VOLUME  = 2.5
-
-# ── Accent colours per category (same palette as shorts) ─────────────────────
-CAT_COLORS = {
-    "rain":        "0x2255BB",
-    "forest":      "0x1A7A22",
-    "ocean":       "0x006688",
-    "fireplace":   "0xBB4400",
-    "meditation":  "0x6633AA",
-    "deep_sleep":  "0x1A1A66",
-    "white_noise": "0x445566",
-    "coffee_shop": "0x6B3A2A",
-}
-_COLOR_DEFAULT = "0x223355"
-
-
-def _detect_font() -> str:
-    if platform.system() == "Windows":
-        return "C\\:/Windows/Fonts/arialbd.ttf"
-    candidates = [
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-        "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-        "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
-    ]
-    for c in candidates:
-        if Path(c).exists():
-            return c
-    return candidates[0]
-
-
-def _esc(s: str) -> str:
-    """Escape text for ffmpeg drawtext."""
-    return (s.replace("\\", "\\\\")
-             .replace("'",  "’")
-             .replace('"',  "“")
-             .replace(":",  "\\:")
-             .replace("[",  "\\[")
-             .replace("]",  "\\]")
-             .replace(",",  " ")
-             .replace(";",  " ")
-             .replace("%",  "%%")
-             .replace("\n", " "))
 
 
 def _probe_audio_duration(path: Path) -> float:
@@ -166,62 +126,13 @@ def _video_has_audio(p: Path) -> bool:
         return False
 
 
-def _intro_vf(title: str, category: str) -> str:
-    """Build ffmpeg -vf chain for the Whisk intro clip.
-
-    Layout (1280×720):
-      • Whisk video dimmed with dark overlay
-      • Large sound name centred
-      • Duration tag below name (accent colour)
-      • Thin accent line above and below the title block
-      • Channel branding bottom-centre
-      • Fade-in from black (0→1.5 s), fade-out to black (6.5→8 s)
-    """
-    font    = _detect_font()
-    color   = CAT_COLORS.get(category, _COLOR_DEFAULT)
-    t_esc   = _esc(title.upper())
-    dur_tag = _esc("11 HOURS  •  RELAX & SLEEP")
-    brand   = _esc("Relax Sound")
-    fade_in = 1.5
-    fade_out_start = INTRO_DURATION - 1.5
-
-    return ",".join([
-        f"scale={OUT_W}:{OUT_H}:force_original_aspect_ratio=increase",
-        f"crop={OUT_W}:{OUT_H}",
-        "setsar=1",
-        f"fps=fps={OUT_FPS}",
-
-        # Dark overlay — makes text pop against any background
-        "drawbox=x=0:y=0:w=1280:h=720:color=black@0.62:t=fill",
-
-        # Thin accent bar above title block
-        f"drawbox=x=80:y=270:w=1120:h=3:color={color}:t=fill",
-
-        # Main title — sound name
-        f"drawtext=fontfile='{font}':text='{t_esc}'"
-        f":fontsize=88:fontcolor=white"
-        f":x=(w-text_w)/2:y=290"
-        f":borderw=4:bordercolor=black@0.55",
-
-        # Duration tag — accent colour
-        f"drawtext=fontfile='{font}':text='{dur_tag}'"
-        f":fontsize=38:fontcolor={color}@0.95"
-        f":x=(w-text_w)/2:y=400"
-        f":borderw=2:bordercolor=black@0.40",
-
-        # Thin accent bar below title block
-        f"drawbox=x=80:y=450:w=1120:h=3:color={color}:t=fill",
-
-        # Channel branding bottom
-        f"drawtext=fontfile='{font}':text='{brand}'"
-        f":fontsize=28:fontcolor=white@0.55"
-        f":x=(w-text_w)/2:y=h-48"
-        f":borderw=1:bordercolor=black@0.20",
-
-        # Fade in / out
-        f"fade=t=in:st=0:d={fade_in}:color=black",
-        f"fade=t=out:st={fade_out_start}:d={fade_in}:color=black",
-    ])
+# Intro clip video filter — play as-is, just scale/crop to canvas
+_INTRO_VF = (
+    f"scale={OUT_W}:{OUT_H}:force_original_aspect_ratio=increase,"
+    f"crop={OUT_W}:{OUT_H},"
+    f"setsar=1,"
+    f"fps=fps={OUT_FPS}"
+)
 
 
 def build_long_video(
@@ -266,8 +177,8 @@ def build_long_video(
     #
     # We assemble the command in parts to keep it readable.
 
-    has_intro      = intro_path is not None
-    intro_vf_str   = _intro_vf(title, category) if has_intro else ""
+    has_intro    = intro_path is not None
+    intro_vf_str = _INTRO_VF if has_intro else ""
 
     # Ambient content filter (looped input → trim to CONTENT_DURATION)
     content_vf = (
@@ -285,8 +196,26 @@ def build_long_video(
     )
 
     # ── Determine audio source ────────────────────────────────────────────────
-    def _audio_filter(label: str, needs_aloop: bool) -> str:
-        """Seamless-loop audio filter for the full TOTAL_DURATION."""
+    def _audio_filter(label: str, needs_aloop: bool, has_intro: bool = False) -> str:
+        """Build ambient audio filter.
+
+        has_intro=True:  Whisk clip audio plays first (8 s, fade-out last 2 s),
+                         then ambient fades in over 5 s for the remaining duration.
+        has_intro=False: ambient plays from t=0 with a 5-second fade-in.
+        """
+        if has_intro:
+            aloop = "aloop=loop=-1:size=2e+09," if needs_aloop else ""
+            ambient_dur = TOTAL_DURATION - INTRO_DURATION
+            return (
+                f"[0:a]atrim=0:{INTRO_DURATION},asetpts=PTS-STARTPTS,"
+                f"afade=t=out:st={INTRO_DURATION - 2}:d=2[_intro_a];"
+                f"{label}"
+                f"{aloop}"
+                f"atrim=duration={ambient_dur},asetpts=PTS-STARTPTS,"
+                f"volume={AUDIO_VOLUME},"
+                f"afade=t=in:st=0:d=5[_amb_a];"
+                f"[_intro_a][_amb_a]concat=n=2:v=0:a=1[aout]"
+            )
         aloop = "aloop=loop=-1:size=2e+09," if needs_aloop else ""
         return (
             f"{label}"
@@ -338,7 +267,7 @@ def build_long_video(
         else:
             fc_parts.append("[content_v][black_v]concat=n=2:v=1:a=0[vout]")
 
-        fc_parts.append(_audio_filter(audio_lbl, needs_aloop=False))
+        fc_parts.append(_audio_filter(audio_lbl, needs_aloop=False, has_intro=has_intro))
         fc = ";".join(fc_parts)
 
         cmd = (
@@ -372,7 +301,7 @@ def build_long_video(
             fc_parts.append("[intro_v][content_v][black_v]concat=n=3:v=1:a=0[vout]")
         else:
             fc_parts.append("[content_v][black_v]concat=n=2:v=1:a=0[vout]")
-        fc_parts.append(_audio_filter(media_a, needs_aloop=True))
+        fc_parts.append(_audio_filter(media_a, needs_aloop=True, has_intro=has_intro))
         fc = ";".join(fc_parts)
 
         cmd = (
@@ -391,12 +320,13 @@ def build_long_video(
         else:
             logger.warning("Image — lavfi brown-noise fallback")
 
-        # Generate brown noise for full duration
+        # Generate brown noise — duration adjusted when intro clip is present
+        _noise_dur = TOTAL_DURATION - INTRO_DURATION if has_intro else TOTAL_DURATION
         noise_src = (
             f"anoisesrc=c=brown:a=0.15:r=44100,"
             f"volume={AUDIO_VOLUME},"
             f"afade=t=in:st=0:d=5,"
-            f"atrim=duration={TOTAL_DURATION}"
+            f"atrim=duration={_noise_dur}"
         )
 
         inputs = []
@@ -421,7 +351,15 @@ def build_long_video(
             fc_parts.append("[intro_v][content_v][black_v]concat=n=3:v=1:a=0[vout]")
         else:
             fc_parts.append("[content_v][black_v]concat=n=2:v=1:a=0[vout]")
-        fc_parts.append(f"{audio_lbl}acopy[aout]")
+        if has_intro:
+            fc_parts.append(
+                f"[0:a]atrim=0:{INTRO_DURATION},asetpts=PTS-STARTPTS,"
+                f"afade=t=out:st={INTRO_DURATION - 2}:d=2[_intro_a];"
+                f"{audio_lbl}acopy[_amb_a];"
+                f"[_intro_a][_amb_a]concat=n=2:v=0:a=1[aout]"
+            )
+        else:
+            fc_parts.append(f"{audio_lbl}acopy[aout]")
         fc = ";".join(fc_parts)
 
         extra = ["-tune", "stillimage"] if not is_vid else []
