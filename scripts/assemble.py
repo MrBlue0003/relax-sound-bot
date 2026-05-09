@@ -91,7 +91,7 @@ def esc(s: str) -> str:
     """Escape text for ffmpeg drawtext."""
     return (s.replace("\\", "\\\\")
              .replace("'",  "’")   # curly apostrophe — safe in filter
-             .replace('"',  "“")
+             .replace('"',  "”")
              .replace(":",  "\\:")
              .replace("[",  "\\[")
              .replace("]",  "\\]")
@@ -116,37 +116,6 @@ def _run_ffmpeg(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
     else:
         result = subprocess.run(args, capture_output=True, text=True, cwd=str(cwd))
     return result
-
-
-def _video_has_audio(video_path: Path) -> bool:
-    """Return True if video has a real, non-silent audio stream."""
-    try:
-        r = subprocess.run(
-            ["ffprobe", "-v", "quiet", "-select_streams", "a:0",
-             "-show_entries", "stream=codec_type", "-of", "csv=p=0",
-             str(video_path)],
-            capture_output=True, text=True, timeout=15,
-        )
-        if "audio" not in r.stdout:
-            return False
-        r2 = subprocess.run(
-            ["ffmpeg", "-i", str(video_path),
-             "-t", "10", "-af", "volumedetect", "-f", "null", "-"],
-            capture_output=True, text=True, timeout=30,
-        )
-        for line in r2.stderr.splitlines():
-            if "mean_volume" in line:
-                try:
-                    db = float(line.split(":")[1].strip().replace(" dB", ""))
-                    if db < -90.0:
-                        logger.info(f"Audio silent ({db:.1f}dB) — using fallback")
-                        return False
-                    return True
-                except Exception:
-                    pass
-        return True
-    except Exception:
-        return False
 
 
 def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
@@ -354,13 +323,13 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     """
     Build a relaxation Short video with seamless audio loop.
 
-    Audio priority:
-      1. audio_path file provided → loop that file (real birds/rain/etc.)
-      2. video with non-silent audio → use original video audio
-      3. video without audio / image → lavfi synthetic fallback
+    Audio priority (video is always muted — only visual background):
+      1. audio_path (audio_file) exists  → loop that dedicated MP3
+      2. audio_lavfi from theme          → synthesised sound (sine/noise)
 
-    The audio crossfades at the loop boundary so the end blends imperceptibly
-    into the beginning — no fade-out, no fade-in, no audible seam.
+    The video's own audio is intentionally ignored: Pixabay clips carry
+    random stock music or ambient noise that doesn't match the variant's
+    intended sound design.
 
     Args:
         theme:         Variant dict (name, subtitle, category_id, audio_lavfi, …)
@@ -378,7 +347,7 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     media_str = str(media_path.resolve()).replace("\\", "/")
     out_str   = str(output_path.resolve()).replace("\\", "/")
 
-    # Lavfi fallback (used only when no real audio is available)
+    # Lavfi synthesis (used when no dedicated audio file is provided)
     audio_lavfi = theme.get("audio_lavfi", "anoisesrc=color=brown,volume=4.0")
 
     encode = [
@@ -408,24 +377,9 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
             out_str,
         ]
 
-    elif is_video and _video_has_audio(media_path):
-        # ── Case 2: video has usable original audio ───────────────────────────
-        logger.info("Using video's own audio")
-        audio_flt = _seamless_audio_filter("[0:a]", duration, CF, volume=2.5)
-        ffmpeg_args = [
-            "ffmpeg", "-y",
-            "-stream_loop", "-1", "-i", media_str,
-            "-filter_complex",
-            f"[0:v]{vf}[vout];{audio_flt}",
-            "-map", "[vout]", "-map", "[aout]",
-            "-t", str(duration),
-            *encode,
-            out_str,
-        ]
-
     elif is_video:
-        # ── Case 3: video but mute → lavfi ───────────────────────────────────
-        logger.info("Video mute — lavfi fallback")
+        # ── Case 2: video (always muted) + lavfi synthesis ───────────────────
+        logger.info(f"Video + lavfi: {audio_lavfi[:60]}")
         audio_flt = _seamless_audio_filter("[1:a]", duration, CF, volume=1.0)
         ffmpeg_args = [
             "ffmpeg", "-y",
@@ -440,8 +394,8 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
         ]
 
     else:
-        # ── Case 4: still image + lavfi ──────────────────────────────────────
-        logger.info("Image + lavfi fallback")
+        # ── Case 3: still image + lavfi ──────────────────────────────────────
+        logger.info("Image + lavfi")
         audio_flt = _seamless_audio_filter("[1:a]", duration, CF, volume=1.0)
         ffmpeg_args = [
             "ffmpeg", "-y",
