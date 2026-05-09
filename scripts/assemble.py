@@ -4,10 +4,8 @@ Visual design:
   • Hook text for first 3s   — grabs the 2-second algorithm retention check
   • Category-coloured accent  — visual brand identity per sound type
   • Fake bottom gradient      — readability without covering the scenery
-  • Animated progress bar     — keeps viewers watching to the end
   • Loop badge                — sets expectation, reduces drop-off
   • Category label badge      — top-right pill for instant visual ID
-  • End-screen CTA (last 5s)  — "Follow + Save" drives algorithm signals
   • Slot-based hook rotation  — 3 hooks/category so each post feels fresh
 """
 import logging
@@ -22,34 +20,31 @@ HEIGHT = 1920
 
 # ── Per-category accent colours (ffmpeg 0xRRGGBB) ────────────────────────────
 CAT_COLORS = {
-    "rain":        "0x2255BB",   # deep blue
-    "forest":      "0x1A7A22",   # forest green
-    "ocean":       "0x006688",   # teal
-    "fireplace":   "0xBB4400",   # ember orange
-    "meditation":  "0x6633AA",   # purple
-    "deep_sleep":  "0x1A1A66",   # midnight blue
-    "white_noise": "0x445566",   # slate
-    "coffee_shop": "0x6B3A2A",   # coffee brown
+    "rain":        "0x2255BB",
+    "forest":      "0x1A7A22",
+    "ocean":       "0x006688",
+    "fireplace":   "0xBB4400",
+    "meditation":  "0x6633AA",
+    "deep_sleep":  "0x1A1A66",
+    "white_noise": "0x445566",
+    "coffee_shop": "0x6B3A2A",
 }
 _CAT_COLOR_DEFAULT = "0x222233"
 
 # ── Per-category color grading (ffmpeg eq filter) ─────────────────────────────
-# eq params: saturation, gamma_r/g/b (>1 boosts, <1 reduces), gamma (overall)
 CAT_GRADE = {
-    "rain":        "eq=saturation=0.90:gamma_r=0.93:gamma_b=1.08",    # cool, muted blue
-    "forest":      "eq=saturation=1.15:gamma_r=1.05:gamma_g=1.03",    # warm, lush green
-    "ocean":       "eq=saturation=0.95:gamma_r=0.91:gamma_b=1.10",    # cool teal
-    "fireplace":   "eq=saturation=1.20:gamma_r=1.12:gamma_b=0.88",    # warm amber/orange
-    "meditation":  "eq=saturation=0.82:gamma=1.06:gamma_b=1.05",      # soft, dreamy purple
-    "deep_sleep":  "eq=saturation=0.78:gamma=0.93:gamma_b=1.06",      # dark, cool, calm
-    "white_noise": "eq=saturation=0.88:gamma=1.02",                   # neutral, clean
-    "coffee_shop": "eq=saturation=1.10:gamma_r=1.10:gamma_b=0.92",    # warm golden-brown
+    "rain":        "eq=saturation=0.90:gamma_r=0.93:gamma_b=1.08",
+    "forest":      "eq=saturation=1.15:gamma_r=1.05:gamma_g=1.03",
+    "ocean":       "eq=saturation=0.95:gamma_r=0.91:gamma_b=1.10",
+    "fireplace":   "eq=saturation=1.20:gamma_r=1.12:gamma_b=0.88",
+    "meditation":  "eq=saturation=0.82:gamma=1.06:gamma_b=1.05",
+    "deep_sleep":  "eq=saturation=0.78:gamma=0.93:gamma_b=1.06",
+    "white_noise": "eq=saturation=0.88:gamma=1.02",
+    "coffee_shop": "eq=saturation=1.10:gamma_r=1.10:gamma_b=0.92",
 }
 _GRADE_DEFAULT = "eq=saturation=1.0"
 
 # ── Per-category hook lines (shown for first 3 s) ─────────────────────────────
-# 3 hooks per category — rotated by slot so each daily post feels fresh.
-# Questions > statements — viewer thinks "that's me" → keeps watching.
 CAT_HOOKS: dict[str, list[str]] = {
     "rain":        ["Can't sleep?",          "Stressed out?",           "Rain to the rescue..."],
     "forest":      ["Feeling stressed?",     "Take a deep breath...",   "Nature heals"],
@@ -64,7 +59,6 @@ _HOOK_DEFAULT = "Need to relax?"
 
 
 def _detect_font() -> str:
-    """Return ffmpeg-escaped font path for current OS."""
     if platform.system() == "Windows":
         return "C\\:/Windows/Fonts/arialbd.ttf"
     candidates = [
@@ -84,8 +78,8 @@ FONT_PATH = _detect_font()
 def esc(s: str) -> str:
     """Escape text for ffmpeg drawtext."""
     return (s.replace("\\", "\\\\")
-             .replace("'",  "\u2019")   # curly apostrophe — safe in filter
-             .replace('"',  "\u201c")
+             .replace("'",  "’")
+             .replace('"',  "“")
              .replace(":",  "\\:")
              .replace("[",  "\\[")
              .replace("]",  "\\]")
@@ -97,11 +91,10 @@ def esc(s: str) -> str:
 
 
 def _run_ffmpeg(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
-    """Run ffmpeg cross-platform."""
     if platform.system() == "Windows":
         bat = cwd / "_ffmpeg_run.bat"
         cmd_line = " ".join(
-            f'"{a}"' if (" " in a and not a.startswith('"')) else a
+            f'"{ a}"' if (" " in a and not a.startswith('"')) else a
             for a in args
         )
         bat.write_text(f'@echo off\ncd /d "{cwd}"\n{cmd_line}\n', encoding="utf-8")
@@ -112,61 +105,12 @@ def _run_ffmpeg(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
     return result
 
 
-def _video_has_audio(video_path: Path) -> bool:
-    """Return True if video has a real, non-silent audio stream."""
-    try:
-        r = subprocess.run(
-            ["ffprobe", "-v", "quiet", "-select_streams", "a:0",
-             "-show_entries", "stream=codec_type", "-of", "csv=p=0",
-             str(video_path)],
-            capture_output=True, text=True, timeout=15,
-        )
-        if "audio" not in r.stdout:
-            return False
-        r2 = subprocess.run(
-            ["ffmpeg", "-i", str(video_path),
-             "-t", "10", "-af", "volumedetect", "-f", "null", "-"],
-            capture_output=True, text=True, timeout=30,
-        )
-        for line in r2.stderr.splitlines():
-            if "mean_volume" in line:
-                try:
-                    db = float(line.split(":")[1].strip().replace(" dB", ""))
-                    if db < -90.0:
-                        logger.info(f"Audio silent ({db:.1f}dB) — using fallback")
-                        return False
-                    return True
-                except Exception:
-                    pass
-        return True
-    except Exception:
-        return False
-
-
 def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
-    """
-    Build the full ffmpeg -vf filter chain.
-
-    Layout (1080×1920):
-      y=0–90    : HOOK TEXT (0-3s) → END-SCREEN CTA (last 5s) — same banner zone
-      y=90–1480 : clean ambient video (no overlays)
-      y=0–56    : category label badge, top-right pill (appears after hook fades)
-      y=1480–1920: bottom zone
-          1480–1920: fake gradient (3 dark layers)
-          1480–1920: 10-px left accent stripe
-          1555     : NAME   (fontsize 84, white, bold)
-          1652     : thin separator line
-          1668     : subtitle (fontsize 42, white 92%)
-          1855–1864: progress bar track (dark)
-          1855–1864: progress bar fill (animated, category colour)
-          1873     : "LOOP" badge text
-    """
     font  = FONT_PATH
     cat   = theme.get("category_id", "")
     color = CAT_COLORS.get(cat, _CAT_COLOR_DEFAULT)
     grade = CAT_GRADE.get(cat, _GRADE_DEFAULT)
 
-    # Slot-based hook rotation — pick from list; fall back to theme override or default
     hooks_opt = CAT_HOOKS.get(cat)
     if isinstance(hooks_opt, list):
         hook_raw = hooks_opt[slot % len(hooks_opt)]
@@ -178,11 +122,8 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
 
     name  = esc(theme["name"].upper())
     sub   = esc(theme["subtitle"])
-
-    # Category label badge text (ASCII only — emoji unsupported in drawtext)
     cat_label = cat.upper().replace("_", " ")
 
-    # Dynamic loop label: "1 MIN LOOP", "2 MIN LOOP", or "60S LOOP" etc.
     if duration >= 60 and duration % 60 == 0:
         loop_label = f"{duration // 60} MIN LOOP"
     elif duration >= 60:
@@ -195,18 +136,13 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f"scale={WIDTH}:{HEIGHT}:force_original_aspect_ratio=increase",
         f"crop={WIDTH}:{HEIGHT}",
         "setsar=1",
-
-        # ── Color grading — per-category mood ───────────────────────────────
+        # ── Color grading ───────────────────────────────────────────────────────
         grade,
-
-        # ── Vignette — subtle dark edge, pulls focus to centre ───────────────
-        # angle=PI/5 ≈ 36° — gentle, not cinematic-heavy
+        # ── Vignette ──────────────────────────────────────────────────────────
         "vignette=angle=PI/5:mode=forward",
-
-        # ── Sharpening — luma 0.8, chroma 0.4 (crisp on mobile screens) ─────
+        # ── Sharpening ─────────────────────────────────────────────────────────
         "unsharp=luma_msize_x=5:luma_msize_y=5:luma_amount=0.8"
         ":chroma_msize_x=3:chroma_msize_y=3:chroma_amount=0.4",
-
         # ── Hook banner (0–3 s) ──────────────────────────────────────────────
         f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.90:t=fill"
         f":enable='between(t,0,2.5)'",
@@ -214,10 +150,8 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f":enable='between(t,2.5,2.8)'",
         f"drawbox=x=0:y=0:w={WIDTH}:h=195:color={color}@0.10:t=fill"
         f":enable='between(t,2.8,3.0)'",
-        # Thin bottom accent on hook box
         f"drawbox=x=0:y=188:w={WIDTH}:h=7:color={color}:t=fill"
         f":enable='between(t,0,2.5)'",
-        # Hook text — 3-step alpha fade (full → dim → ghost)
         f"drawtext=fontfile='{font}':text='{hook}'"
         f":fontsize=74:fontcolor=white:x=(w-text_w)/2:y=62"
         f":borderw=3:bordercolor=black@0.55"
@@ -230,41 +164,30 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f":fontsize=74:fontcolor=white@0.10:x=(w-text_w)/2:y=62"
         f":borderw=0:bordercolor=black@0.00"
         f":enable='between(t,2.8,3.0)'",
-
-        # ── Bottom gradient (3 overlapping semi-transparent layers) ─────────
+        # ── Bottom gradient ───────────────────────────────────────────────────
         f"drawbox=x=0:y=1480:w={WIDTH}:h=440:color=black@0.28:t=fill",
         f"drawbox=x=0:y=1610:w={WIDTH}:h=310:color=black@0.52:t=fill",
         f"drawbox=x=0:y=1740:w={WIDTH}:h=180:color=black@0.78:t=fill",
-
-        # ── Left category accent stripe ──────────────────────────────────────
+        # ── Left accent stripe ─────────────────────────────────────────────────
         f"drawbox=x=0:y=1480:w=10:h=440:color={color}:t=fill",
-
-        # ── Sound name ───────────────────────────────────────────────────────
+        # ── Name ──────────────────────────────────────────────────────────────
         f"drawtext=fontfile='{font}':text='{name}'"
         f":fontsize=84:fontcolor=white:x=(w-text_w)/2:y=1555"
         f":borderw=3:bordercolor={color}@0.40",
-
-        # ── Thin separator line (category colour, between name and subtitle) ──
+        # ── Separator ─────────────────────────────────────────────────────────
         f"drawbox=x=80:y=1652:w={WIDTH - 160}:h=1:color={color}@0.50:t=fill",
-
-        # ── Subtitle ─────────────────────────────────────────────────────────
+        # ── Subtitle ───────────────────────────────────────────────────────────
         f"drawtext=fontfile='{font}':text='{sub}'"
         f":fontsize=42:fontcolor=white@0.93:x=(w-text_w)/2:y=1668"
         f":borderw=2:bordercolor=black@0.70",
-
-        # ── Loop badge ────────────────────────────────────────────────────────
-        # Progress bar removed — a filling bar is an obvious "ending soon" signal
-        # that breaks seamless loop illusion. Static badge sets expectations instead.
+        # ── Loop badge ──────────────────────────────────────────────────────────
         f"drawtext=fontfile='{font}':text='{loop_label}'"
         f":fontsize=28:fontcolor=white@0.55:x=(w-text_w)/2:y=1873",
-
-        # ── Watermark — bottom-right, very subtle ─────────────────────────────
+        # ── Watermark ──────────────────────────────────────────────────────────
         f"drawtext=fontfile='{font}':text='Relax Sound'"
         f":fontsize=22:fontcolor=white@0.30:x=w-text_w-18:y=h-36"
         f":borderw=1:bordercolor=black@0.15",
-
-        # ── Category label badge — top-right pill (visible after hook fades) ──
-        # Dark pill box: fixed width covers longest label ("WHITE NOISE" / "COFFEE SHOP")
+        # ── Category label badge ───────────────────────────────────────────────
         f"drawbox=x={WIDTH - 210}:y=8:w=202:h=50:color=black@0.62:t=fill"
         f":enable='between(t,3.1,{duration})'",
         f"drawtext=fontfile='{font}':text='{cat_label}'"
@@ -272,10 +195,6 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
         f":x=w-text_w-18:y=21"
         f":borderw=1:bordercolor=black@0.35"
         f":enable='between(t,3.1,{duration})'",
-
-        # ── End-screen CTA removed ─────────────────────────────────────────────
-        # Showing "Follow + Save" in the last 5s signals the video is ending,
-        # breaking seamless loop perception. Omit for perfect loop experience.
     ]
 
     return ",".join(filters)
@@ -283,29 +202,6 @@ def _build_vf(theme: dict, duration: int, slot: int = 0) -> str:
 
 def _seamless_audio_filter(src_label: str, duration: int, cf: int = 3,
                             volume: float = 2.5, has_aloop: bool = False) -> str:
-    """Return a filter_complex fragment that produces exactly `duration` seconds
-    of seamlessly-looping audio from `src_label`.
-
-    Strategy — crossfade at the loop boundary:
-      1. Pull duration+cf seconds from the (infinite) source.
-      2. Split into two streams:
-           a_main  = first `duration` seconds (the full playback)
-           a_start = seconds [duration .. duration+cf]  which, because the
-                     source loops, equals the FIRST cf seconds of the clip.
-      3. acrossfade(d=cf): fades the last cf seconds of a_main into the first
-         cf seconds of a_start.
-      Output = duration + cf - cf = duration seconds. ✓
-      At t=duration the audio has fully transitioned to "beginning of clip",
-      so when YouTube replays from t=0 the listener hears no jump.
-
-    Args:
-        src_label:  ffmpeg pad label, e.g. "[1:a]"
-        duration:   desired output duration in seconds
-        cf:         crossfade duration in seconds (default 3)
-        volume:     volume multiplier (default 2.5; pass 1.0 for lavfi sources)
-        has_aloop:  if True, prepend aloop filter (needed when src is a finite
-                    video audio stream — not needed for stream_loop/-1 inputs)
-    """
     aloop_prefix = "aloop=loop=-1:size=2e+09," if has_aloop else ""
     vol_filter   = f"volume={volume}," if volume != 1.0 else ""
     return (
@@ -327,22 +223,13 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     """
     Build a relaxation Short video with seamless audio loop.
 
-    Audio priority:
-      1. audio_path file provided → loop that file (real birds/rain/etc.)
-      2. video with non-silent audio → use original video audio
-      3. video without audio / image → lavfi synthetic fallback
+    Audio priority (video is always muted — only visual background):
+      1. audio_path (audio_file) exists  → loop that dedicated MP3
+      2. audio_lavfi from theme          → synthesised sound (sine/noise)
 
-    The audio crossfades at the loop boundary so the end blends imperceptibly
-    into the beginning — no fade-out, no fade-in, no audible seam.
-
-    Args:
-        theme:         Variant dict (name, subtitle, category_id, audio_lavfi, …)
-        media_path:    Source video (.mp4) or image (.jpg/.png)
-        output_path:   Destination .mp4
-        duration:      Output duration in seconds
-        audio_path:    Optional real audio file to loop
-        slot:          Daily slot index (0-3) used to rotate hook text per post
-        crossfade_dur: Seconds of crossfade at the loop boundary (default 3)
+    The video's own audio is intentionally ignored: Pixabay clips carry
+    random stock music or ambient noise that doesn't match the variant's
+    intended sound design.
     """
     CF = crossfade_dur
 
@@ -351,7 +238,6 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     media_str = str(media_path.resolve()).replace("\\", "/")
     out_str   = str(output_path.resolve()).replace("\\", "/")
 
-    # Lavfi fallback (used only when no real audio is available)
     audio_lavfi = theme.get("audio_lavfi", "anoisesrc=color=brown,volume=4.0")
 
     encode = [
@@ -361,8 +247,7 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
     ]
 
     if audio_path and audio_path.exists():
-        # ── Case 1: real audio file (birds, rain, fire…) ─────────────────────
-        # Source is infinite via -stream_loop -1, so no aloop needed in filter.
+        # ── Case 1: dedicated audio file (rain.mp3, crackling_fire.mp3…) ────────
         audio_str = str(audio_path.resolve()).replace("\\", "/")
         logger.info(f"Using real audio: {audio_path.name}")
         input_args = (
@@ -382,26 +267,10 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
             out_str,
         ]
 
-    elif is_video and _video_has_audio(media_path):
-        # ── Case 2: video has usable original audio ───────────────────────────
-        # [0:a] from -stream_loop -1 is already infinite — aloop not needed.
-        logger.info("Using video's own audio")
-        audio_flt = _seamless_audio_filter("[0:a]", duration, CF, volume=2.5)
-        ffmpeg_args = [
-            "ffmpeg", "-y",
-            "-stream_loop", "-1", "-i", media_str,
-            "-filter_complex",
-            f"[0:v]{vf}[vout];{audio_flt}",
-            "-map", "[vout]", "-map", "[aout]",
-            "-t", str(duration),
-            *encode,
-            out_str,
-        ]
-
     elif is_video:
-        # ── Case 3: video but mute → lavfi ───────────────────────────────────
-        # Lavfi generates continuous audio — no looping needed, volume=1.0.
-        logger.info("Video mute — lavfi fallback")
+        # ── Case 2: video (muted) + lavfi synthesis ────────────────────────────
+        # Video audio is ignored — lavfi defines the intended sound.
+        logger.info(f"Video + lavfi: {audio_lavfi[:60]}")
         audio_flt = _seamless_audio_filter("[1:a]", duration, CF, volume=1.0)
         ffmpeg_args = [
             "ffmpeg", "-y",
@@ -416,8 +285,8 @@ def build_video(theme: dict, media_path: Path, output_path: Path,
         ]
 
     else:
-        # ── Case 4: still image + lavfi ──────────────────────────────────────
-        logger.info("Image + lavfi fallback")
+        # ── Case 3: still image + lavfi ─────────────────────────────────────
+        logger.info(f"Image + lavfi: {audio_lavfi[:60]}")
         audio_flt = _seamless_audio_filter("[1:a]", duration, CF, volume=1.0)
         ffmpeg_args = [
             "ffmpeg", "-y",
