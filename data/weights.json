@@ -1,11 +1,12 @@
 {
-  "updated": "2026-05-03",
+  "updated": "2026-05-10",
   "categories": {
-    "rain": 1.487,
-    "meditation": 1.562,
-    "white_noise": 0.585,
-    "ocean": 0.872,
-    "forest": 1.32,
-    "fireplace": 0.5
+    "rain": 2.0,
+    "meditation": 2.0,
+    "white_noise": 0.701,
+    "ocean": 0.881,
+    "forest": 0.987,
+    "fireplace": 0.5,
+    "coffee_shop": 0.5
   }
 }
