@@ -3,9 +3,13 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# 4x/day targeting peak sleep/relax listening hours across timezones:
-# 20:00 UTC = 22h EU | 22:00 UTC = 11 PM UK | 01:00 UTC = 9 PM US East | 04:00 UTC = 9 PM US West
-cronSchedule = "0 20,22,1,4 * * *"
+# 4x/day optimized for peak TikTok engagement for sleep/relax niche
+# (data: Buffer 7M posts, Sprout Social 2B engagements — peak = 8 PM local across markets)
+# 18:00 UTC = 8 PM Berlin (peak EU evening wind-down)
+# 22:00 UTC = 11 PM UK / 6 PM US East (afternoon US peak)
+# 00:00 UTC = 8 PM US East (PEAK US East evening — top global slot)
+# 03:00 UTC = 8 PM US West (PEAK US West evening)
+cronSchedule = "0 18,22,0,3 * * *"
 startCommand = "python -u run.py"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
