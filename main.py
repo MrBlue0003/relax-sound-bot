@@ -33,6 +33,7 @@ from scripts.fetch_media import (
 )
 from scripts.assemble import build_video
 from scripts.upload import upload_video
+from scripts.upload_buffer import post_short_to_tiktok
 from scripts.github_log import pull_log, push_log
 import scripts.monthly_compilation as monthly_compilation
 
@@ -257,6 +258,14 @@ def main() -> int:
                     audio_path=audio_path, slot=slot_in_day)
 
         video_id = upload_video(output_path, variant)
+
+        # Post to TikTok via Buffer (non-fatal — YouTube upload already done)
+        try:
+            tiktok_ok = post_short_to_tiktok(output_path, variant)
+            if tiktok_ok:
+                logger.info("TikTok: posted via Buffer")
+        except Exception as buf_err:
+            logger.warning(f"TikTok/Buffer post failed (non-fatal): {buf_err}")
 
         # Push updated log to GitHub for persistence across Railway runs
         push_log(config.UPLOADED_FILE)
