@@ -1,0 +1,10 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# Once per day at 06:00 UTC = 09:00 Romania time
+cronSchedule = "0 6 * * *"
+startCommand = "python -u run.py"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
