@@ -99,6 +99,26 @@ def _make_seamless_loop(audio_path: Path, work_dir: Path, xfade: float = 2.0) ->
     return out
 
 
+def extract_thumbnail(video_path: Path, output_path: Path) -> Path | None:
+    """Extract a JPEG frame from 1 minute into the ambient content section."""
+    timestamp = INTRO_DURATION + 60  # skip intro, grab a frame well inside the content
+    cmd = [
+        "ffmpeg", "-y",
+        "-ss", str(timestamp),
+        "-i", str(video_path),
+        "-vframes", "1",
+        "-vf", f"scale={OUT_W}:{OUT_H}",
+        "-q:v", "2",
+        str(output_path),
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+    if r.returncode == 0 and output_path.exists() and output_path.stat().st_size > 0:
+        logger.info(f"Thumbnail extracted: {output_path.name}")
+        return output_path
+    logger.warning(f"Thumbnail extraction failed: {r.stderr[-200:]}")
+    return None
+
+
 def _is_video(p: Path) -> bool:
     return p.suffix.lower() in (".mp4", ".mov", ".avi", ".webm", ".mkv")
 

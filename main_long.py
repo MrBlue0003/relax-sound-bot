@@ -24,7 +24,7 @@ from scripts.fetch_media import (
     download_video_with_fallbacks,
     download_image_with_fallbacks,
 )
-from scripts.assemble_long import build_long_video
+from scripts.assemble_long import build_long_video, extract_thumbnail
 from scripts.upload_long import upload_long_video
 
 
@@ -165,8 +165,12 @@ def main() -> int:
             audio_lavfi=audio_lavfi,
         )
 
+        # Extract thumbnail from content section (1 min into ambient visuals)
+        thumb_path = work_dir / "thumbnail.jpg"
+        thumbnail = extract_thumbnail(output_path, thumb_path)
+
         # Upload
-        video_id = upload_long_video(output_path, variant)
+        video_id = upload_long_video(output_path, variant, thumbnail_path=thumbnail)
 
         elapsed = (datetime.now(timezone.utc) - start).total_seconds()
         logger.info("=" * 60)

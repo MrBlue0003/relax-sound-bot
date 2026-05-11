@@ -131,24 +131,52 @@ def _verify_channel(youtube) -> tuple[str, str]:
     return channel_id, channel_name
 
 
-def _make_chapters(duration_hours: int) -> str:
-    """Generate timestamp chapters string."""
-    lines = ["00:00:00 - Start"]
-    total_min = duration_hours * 60
-    step = 15  # chapter every 15 minutes
-    t = step
-    while t < total_min:
-        h = t // 60
-        m = t % 60
-        lines.append(f"{h:02d}:{m:02d}:00 - Continuing...")
-        t += step
-    h = total_min // 60
-    m = total_min % 60
-    lines.append(f"{h:02d}:{m:02d}:00 - End")
+_INTRO_S   = 8           # seconds
+_CONTENT_S = 4 * 3600   # 4 hours of visuals
+_BLACK_S   = 7 * 3600   # 7 hours black screen
+_TOTAL_S   = _INTRO_S + _CONTENT_S + _BLACK_S  # 39 608 s
+
+
+def _fmt_ts(seconds: int) -> str:
+    h = seconds // 3600
+    m = (seconds % 3600) // 60
+    s = seconds % 60
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
+
+def _make_chapters(sound_name: str = "") -> str:
+    """Generate chapters that reflect the real 11h structure:
+    8s intro → 4h visuals → 7h black screen.
+    """
+    label = sound_name if sound_name else "Ambient sounds"
+    lines = [f"00:00:00 - Intro"]
+    lines.append(f"{_fmt_ts(_INTRO_S)} - {label} begins")
+    for hour in range(1, 4):
+        lines.append(f"{_fmt_ts(_INTRO_S + hour * 3600)} - Hour {hour}")
+    lines.append(
+        f"{_fmt_ts(_INTRO_S + _CONTENT_S)} - Screen turns black — audio continues"
+    )
+    for hour in range(1, 8):
+        lines.append(f"{_fmt_ts(_INTRO_S + _CONTENT_S + hour * 3600)} - Still playing...")
+    lines.append(f"{_fmt_ts(_TOTAL_S)} - End")
     return "\n".join(lines)
 
 
-def upload_long_video(video_path: Path, variant: dict) -> str:
+def _upload_thumbnail(youtube, video_id: str, thumbnail_path: Path) -> None:
+    """Set a custom thumbnail on an already-uploaded video."""
+    try:
+        media = MediaFileUpload(str(thumbnail_path), mimetype="image/jpeg")
+        youtube.thumbnails().set(videoId=video_id, media_body=media).execute()
+        logger.info(f"Thumbnail uploaded for video {video_id}")
+    except Exception as e:
+        logger.warning(f"Thumbnail upload failed (non-fatal): {e}")
+
+
+def upload_long_video(
+    video_path: Path,
+    variant: dict,
+    thumbnail_path: Path | None = None,
+) -> str:
     """Upload a long ambient video to YouTube. Returns video_id."""
     if not video_path.exists():
         raise FileNotFoundError(f"Video not found: {video_path}")
@@ -157,15 +185,15 @@ def upload_long_video(video_path: Path, variant: dict) -> str:
     subtitle = variant.get("subtitle", "")
     tags_base = variant.get("tags", [])
     category = variant.get("category", "")
-    duration_hours = variant.get("duration_hours", 1)
+    sound_name = variant.get("name", title)
 
     # Clean title — ensure it stays under 100 chars
     yt_title = title
     if len(yt_title) > 100:
         yt_title = yt_title[:97] + "…"
 
-    # Build chapters
-    chapters = _make_chapters(duration_hours)
+    # Chapters reflecting real structure
+    chapters = _make_chapters(sound_name)
 
     # Hashtags
     cat_tags = _CATEGORY_HASHTAGS.get(category, "") or _CATEGORY_HASHTAGS_EXTRA.get(category, "")
@@ -177,6 +205,13 @@ def upload_long_video(video_path: Path, variant: dict) -> str:
         f"{subtitle}\n\n"
         f"🔊 Turn on sound for the full experience!\n"
         f"🌿 Subscribe for daily relaxation sounds 🔔\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"🎬 Video Structure (11 hours total)\n"
+        f"• 0:00:00 → 0:00:08  — Short intro\n"
+        f"• 0:00:08 → 4:00:08  — Ambient visuals + seamless audio loop\n"
+        f"• 4:00:08 → 11:00:08 — Black screen — audio continues all night\n\n"
+        f"💡 Tip: Start the video and let your screen turn off naturally.\n"
+        f"   The sound keeps playing for the full 11 hours.\n\n"
         f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         f"Chapters:\n"
         f"{chapters}\n\n"
@@ -195,7 +230,7 @@ def upload_long_video(video_path: Path, variant: dict) -> str:
     # Deduplicated tag list
     all_tags = list(dict.fromkeys(
         tags_base + [
-            "relaxing sounds", "sleep sounds", "ASMR", "1 hour",
+            "relaxing sounds", "sleep sounds", "ASMR", "11 hours",
             "ambient sounds", "nature sounds", "stress relief",
             "calm music", "meditation", "sleep music", "background music",
             "focus music", "long video", "no ads",
@@ -248,6 +283,8 @@ def upload_long_video(video_path: Path, variant: dict) -> str:
 
             video_id = response["id"]
             logger.info(f"Upload complete: https://www.youtube.com/watch?v={video_id}")
+            if thumbnail_path and thumbnail_path.exists():
+                _upload_thumbnail(youtube, video_id, thumbnail_path)
             _record_upload(video_id, yt_title, variant)
             return video_id
 
