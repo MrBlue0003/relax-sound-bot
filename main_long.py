@@ -140,7 +140,7 @@ def main() -> int:
             logger.error(f"Could not download any media for: {variant['title']}")
             return 1
 
-        # Resolve audio file
+        # Resolve audio source (real file takes priority over lavfi)
         audio_path = None
         audio_file = variant.get("audio_file")
         if audio_file:
@@ -151,6 +151,8 @@ def main() -> int:
                 logger.warning(f"audio_file not found: {audio_path} — lavfi fallback")
                 audio_path = None
 
+        audio_lavfi = variant.get("audio_lavfi") if not audio_path else None
+
         # Assemble long video
         safe_id   = variant["id"]
         output_path = work_dir / f"long_{safe_id}_{timestamp}.mp4"
@@ -160,6 +162,7 @@ def main() -> int:
             output_path=output_path,
             title=variant["title"],
             category=variant.get("category", ""),
+            audio_lavfi=audio_lavfi,
         )
 
         # Upload

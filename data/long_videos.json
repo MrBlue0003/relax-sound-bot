@@ -160,7 +160,7 @@
       "duration_hours": 10,
       "title": "10 Hours Fireplace & Rain 🔥🌧️ | Ultimate Cozy Sounds | No Ads",
       "subtitle": "Rain outside, warm fire inside — pure comfort",
-      "audio_file": "forest_rain.mp3",
+      "audio_file": "crackling_fire.mp3",
       "video_queries": ["fireplace rainy night", "cozy fire rain window", "fireplace warm winter"],
       "image_queries": ["cozy fireplace rain", "fire rain window", "winter fireplace rain"],
       "tags": ["fireplace rain", "cozy sounds", "10 hour", "rain and fire", "winter sounds", "cozy vibes", "sleep sounds", "no ads"]
@@ -191,7 +191,7 @@
       "duration_hours": 10,
       "title": "10 Hours Coffee Shop Ambience ☕ | Study & Work Sounds | No Ads",
       "subtitle": "Cozy café sounds to boost productivity and focus",
-      "audio_file": "forest_rain.mp3",
+      "audio_file": "cafe_ambience.mp3",
       "video_queries": ["coffee shop cafe interior", "cafe ambience people", "cozy coffee shop"],
       "image_queries": ["coffee shop cozy", "cafe interior", "coffee mug table"],
       "tags": ["coffee shop sounds", "cafe ambience", "study sounds", "work sounds", "10 hour", "focus music", "lofi study", "no ads"]
@@ -202,7 +202,7 @@
       "duration_hours": 10,
       "title": "10 Hours 432Hz Healing Music 🧘 | Deep Meditation | No Ads",
       "subtitle": "Ancient healing frequency to align your mind and body",
-      "audio_file": "forest_birds.mp3",
+      "audio_lavfi": "aevalsrc=sin(2*PI*432*t)*0.35+sin(2*PI*864*t)*0.15+sin(2*PI*216*t)*0.1:s=44100:c=stereo,volume=2.0",
       "video_queries": ["meditation calm nature", "peaceful zen garden", "spiritual meditation"],
       "image_queries": ["meditation nature", "zen garden", "peaceful sunrise"],
       "tags": ["432hz", "healing music", "meditation music", "10 hour", "sleep music", "no ads", "solfeggio", "healing frequency"]

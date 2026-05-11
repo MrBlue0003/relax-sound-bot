@@ -142,6 +142,7 @@ def build_long_video(
     duration: int = TOTAL_DURATION,   # kept for backward-compat (ignored)
     title: str = "",
     category: str = "",
+    audio_lavfi: str | None = None,
 ) -> Path:
     """
     Build an 11-hour ambient video:
@@ -279,7 +280,58 @@ def build_long_video(
             + ["-t", str(TOTAL_DURATION), out_str]
         )
 
-    # ── Case 2: video with its own audio ─────────────────────────────────────
+    # ── Case 2: custom lavfi audio (e.g. 432Hz tone, pink noise) ─────────────
+    elif audio_lavfi:
+        _noise_dur = TOTAL_DURATION - INTRO_DURATION if has_intro else TOTAL_DURATION
+        lavfi_src = f"{audio_lavfi},afade=t=in:st=0:d=5,atrim=duration={_noise_dur}"
+        logger.info(f"Audio: lavfi custom ({audio_lavfi[:60]}...)")
+
+        inputs = []
+        if has_intro:
+            inputs += ["-i", intro_str]
+        if is_vid:
+            inputs += ["-stream_loop", "-1", "-i", media_str]
+        else:
+            inputs += ["-loop", "1", "-i", media_str]
+        inputs += ["-f", "lavfi", "-i", lavfi_src]
+
+        intro_lbl = "[0:v]" if has_intro else None
+        media_lbl = f"[{'1' if has_intro else '0'}:v]"
+        audio_lbl = f"[{'2' if has_intro else '1'}:a]"
+
+        fc_parts = []
+        if has_intro:
+            fc_parts.append(f"{intro_lbl}{intro_vf_str}[intro_v]")
+        fc_parts.append(f"{media_lbl}{content_vf}[content_v]")
+        fc_parts.append(black_seg)
+        if has_intro:
+            fc_parts.append("[intro_v][content_v][black_v]concat=n=3:v=1:a=0[vout]")
+        else:
+            fc_parts.append("[content_v][black_v]concat=n=2:v=1:a=0[vout]")
+
+        if has_intro:
+            fc_parts.append(
+                f"[0:a]atrim=0:{INTRO_DURATION},asetpts=PTS-STARTPTS,"
+                f"afade=t=out:st={INTRO_DURATION - 2}:d=2[_intro_a];"
+                f"{audio_lbl}acopy[_amb_a];"
+                f"[_intro_a][_amb_a]concat=n=2:v=0:a=1[aout]"
+            )
+        else:
+            fc_parts.append(f"{audio_lbl}acopy[aout]")
+        fc = ";".join(fc_parts)
+
+        extra = ["-tune", "stillimage"] if not is_vid else []
+        cmd = (
+            ["ffmpeg", "-y"]
+            + inputs
+            + ["-filter_complex", fc,
+               "-map", "[vout]", "-map", "[aout]"]
+            + base_encode
+            + extra
+            + ["-t", str(TOTAL_DURATION), out_str]
+        )
+
+    # ── Case 3: video with its own audio ─────────────────────────────────────
     elif is_vid and _video_has_audio(media_path):
         logger.info("Using video's own audio (looped for full duration)")
 
@@ -313,7 +365,7 @@ def build_long_video(
             + ["-t", str(TOTAL_DURATION), out_str]
         )
 
-    # ── Case 3 & 4: no real audio → lavfi brown-noise ─────────────────────────
+    # ── Case 4: no real audio → lavfi brown-noise fallback ───────────────────
     else:
         if is_vid:
             logger.warning("Video mute — lavfi brown-noise fallback")
