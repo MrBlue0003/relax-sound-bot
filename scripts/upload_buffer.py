@@ -41,7 +41,8 @@ def _gql(key: str, query: str, variables: dict | None = None) -> dict:
         json={"query": query, "variables": variables or {}},
         timeout=30,
     )
-    r.raise_for_status()
+    if not r.ok:
+        raise RuntimeError(f"Buffer HTTP {r.status_code}: {r.text[:500]}")
     data = r.json()
     if "errors" in data:
         raise RuntimeError(f"Buffer GraphQL error: {data['errors']}")
@@ -201,11 +202,17 @@ def post_short_to_tiktok(video_path: Path, variant: dict) -> bool:
         mutation = """
         mutation CreatePost($input: CreatePostInput!) {
           createPost(input: $input) {
-            ... on Post {
-              id
-              status
-              dueAt
+            ... on PostActionSuccess {
+              post {
+                id
+                status
+                dueAt
+              }
             }
+            ... on InvalidInputError { message }
+            ... on LimitReachedError { message }
+            ... on UnauthorizedError { message }
+            ... on UnexpectedError   { message }
           }
         }
         """
@@ -227,7 +234,11 @@ def post_short_to_tiktok(video_path: Path, variant: dict) -> bool:
 
         logger.info(f"Creating Buffer post for TikTok...")
         data = _gql(key, mutation, variables)
-        post = data.get("createPost", {})
+        result = data.get("createPost", {})
+        # Check for error types
+        if "message" in result:
+            raise RuntimeError(f"Buffer createPost error: {result.get('type','?')} — {result['message']}")
+        post = result.get("post", {})
         post_id = post.get("id", "?")
         status  = post.get("status", "?")
         logger.info(f"TikTok post created via Buffer: id={post_id} status={status}")
