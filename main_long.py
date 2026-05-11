@@ -34,7 +34,7 @@ def setup_logging() -> None:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[
-            logging.StreamHandler(sys.stdout),
+            logging.StreamHandler(open(sys.stdout.fileno(), mode='w', encoding='utf-8', errors='replace', closefd=False)),
             logging.FileHandler(config.LOGS_DIR / "relax_long.log", encoding="utf-8"),
         ],
     )
