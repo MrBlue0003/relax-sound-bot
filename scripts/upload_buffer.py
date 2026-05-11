@@ -19,9 +19,11 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-BUFFER_GQL    = "https://api.buffer.com/graphql"
-CATBOX_URL    = "https://catbox.moe/user/api.php"
-ORG_ID        = "69f49c408c5763cde0019a5b"
+BUFFER_GQL      = "https://api.buffer.com/graphql"
+CATBOX_URL      = "https://catbox.moe/user/api.php"
+LITTERBOX_URL   = "https://litterbox.catbox.moe/resources/internals/api.php"
+NULLPOINTER_URL = "https://0x0.st"
+ORG_ID          = "69f49c408c5763cde0019a5b"
 
 _CAPTION_MAX  = 2200
 _CORE_TAGS    = [
@@ -70,7 +72,7 @@ def _get_tiktok_channel_id(key: str) -> str | None:
 
 
 def _upload_to_catbox(video_path: Path) -> str | None:
-    """Upload video to catbox.moe and return direct URL."""
+    """Upload video to catbox.moe (anonymous) and return direct URL."""
     size_mb = video_path.stat().st_size / (1024 * 1024)
     if size_mb > 200:
         logger.warning(f"Video too large for catbox ({size_mb:.0f} MB > 200 MB limit)")
@@ -81,11 +83,12 @@ def _upload_to_catbox(video_path: Path) -> str | None:
         with open(video_path, "rb") as f:
             r = requests.post(
                 CATBOX_URL,
-                data={"reqtype": "fileupload"},
+                data={"reqtype": "fileupload", "userhash": ""},
                 files={"fileToUpload": (video_path.name, f, "video/mp4")},
+                headers={"User-Agent": "Mozilla/5.0"},
                 timeout=300,
             )
-        if r.status_code == 200 and r.text.startswith("https://"):
+        if r.status_code == 200 and r.text.strip().startswith("https://"):
             url = r.text.strip()
             logger.info(f"Catbox URL: {url}")
             return url
@@ -93,6 +96,72 @@ def _upload_to_catbox(video_path: Path) -> str | None:
     except Exception as e:
         logger.warning(f"Catbox upload error: {e}")
     return None
+
+
+def _upload_to_litterbox(video_path: Path) -> str | None:
+    """Upload video to litterbox.catbox.moe (72h temp, no account needed)."""
+    size_mb = video_path.stat().st_size / (1024 * 1024)
+    if size_mb > 1000:
+        logger.warning(f"Video too large for litterbox ({size_mb:.0f} MB > 1000 MB limit)")
+        return None
+
+    logger.info(f"Uploading to litterbox.catbox.moe ({size_mb:.1f} MB)...")
+    try:
+        with open(video_path, "rb") as f:
+            r = requests.post(
+                LITTERBOX_URL,
+                data={"reqtype": "fileupload", "time": "72h"},
+                files={"fileToUpload": (video_path.name, f, "video/mp4")},
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=300,
+            )
+        if r.status_code == 200 and r.text.strip().startswith("https://"):
+            url = r.text.strip()
+            logger.info(f"Litterbox URL: {url}")
+            return url
+        logger.warning(f"Litterbox upload failed: {r.status_code} {r.text[:150]}")
+    except Exception as e:
+        logger.warning(f"Litterbox upload error: {e}")
+    return None
+
+
+def _upload_to_nullpointer(video_path: Path) -> str | None:
+    """Upload video to 0x0.st as final fallback."""
+    size_mb = video_path.stat().st_size / (1024 * 1024)
+    if size_mb > 512:
+        logger.warning(f"Video too large for 0x0.st ({size_mb:.0f} MB > 512 MB limit)")
+        return None
+
+    logger.info(f"Uploading to 0x0.st ({size_mb:.1f} MB)...")
+    try:
+        with open(video_path, "rb") as f:
+            r = requests.post(
+                NULLPOINTER_URL,
+                files={"file": (video_path.name, f, "video/mp4")},
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=300,
+            )
+        if r.status_code == 200 and r.text.strip().startswith("https://"):
+            url = r.text.strip()
+            logger.info(f"0x0.st URL: {url}")
+            return url
+        logger.warning(f"0x0.st upload failed: {r.status_code} {r.text[:150]}")
+    except Exception as e:
+        logger.warning(f"0x0.st upload error: {e}")
+    return None
+
+
+def _upload_video_public(video_path: Path) -> str | None:
+    """Try multiple free hosts until one works. Returns public URL or None."""
+    url = _upload_to_catbox(video_path)
+    if url:
+        return url
+    logger.info("Trying litterbox.catbox.moe as fallback...")
+    url = _upload_to_litterbox(video_path)
+    if url:
+        return url
+    logger.info("Trying 0x0.st as final fallback...")
+    return _upload_to_nullpointer(video_path)
 
 
 def _build_caption(variant: dict) -> str:
@@ -122,7 +191,7 @@ def post_short_to_tiktok(video_path: Path, variant: dict) -> bool:
         if not channel_id:
             return False
 
-        video_url = _upload_to_catbox(video_path)
+        video_url = _upload_video_public(video_path)
         if not video_url:
             return False
 
