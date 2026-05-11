@@ -376,38 +376,37 @@
           "name": "Waterfall",
           "subtitle": "for Stress Relief",
           "video_queries": [
-            "waterfall nature",
             "waterfall forest",
-            "cascade waterfall"
+            "cascade waterfall nature",
+            "waterfall rocks stream"
           ],
-          "audio_lavfi": "anoisesrc=color=white,highpass=f=500,lowpass=f=8000,volume=5.0",
+          "audio_file": "waterfall.mp3",
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=150,lowpass=f=9000,volume=7.0",
           "tags": [
             "waterfall",
             "nature",
             "stress relief",
             "relax",
             "calm"
-          ],
-          "audio_file": "forest_rain.mp3"
+          ]
         },
         {
           "id": "river_stream",
           "name": "River Stream",
           "subtitle": "for Calm & Focus",
           "video_queries": [
-            "river stream nature",
-            "mountain river",
-            "flowing water stream"
+            "mountain river flowing",
+            "river stream forest",
+            "flowing river nature"
           ],
-          "audio_lavfi": "anoisesrc=color=white,highpass=f=600,lowpass=f=7000,volume=4.5",
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=350,lowpass=f=7000,volume=5.0",
           "tags": [
             "river",
             "water",
             "focus",
             "nature",
             "calm"
-          ],
-          "audio_file": "forest_rain.mp3"
+          ]
         },
         {
           "id": "beach_waves",
@@ -452,19 +451,18 @@
           "name": "Gentle Creek",
           "subtitle": "for Focus & Calm",
           "video_queries": [
-            "creek stream water",
-            "small river nature",
-            "babbling brook forest"
+            "small creek forest",
+            "babbling brook nature",
+            "stream pebbles water"
           ],
-          "audio_lavfi": "anoisesrc=color=white,highpass=f=700,lowpass=f=6000,volume=4.5",
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=500,lowpass=f=5500,volume=4.0",
           "tags": [
             "creek",
             "water",
             "focus",
             "nature",
             "calm"
-          ],
-          "audio_file": "forest_rain.mp3"
+          ]
         }
       ]
     },
@@ -692,11 +690,11 @@
           "name": "Candles & Silence",
           "subtitle": "for Meditation",
           "video_queries": [
-            "candle flame burning",
-            "candles flickering",
-            "candlelight dark"
+            "candles dark room meditation",
+            "candlelight flickering close",
+            "candle flame macro"
           ],
-          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=600,highpass=f=50,volume=0.6",
+          "audio_lavfi": "anoisesrc=color=pink,lowpass=f=800,highpass=f=50,volume=1.8",
           "tags": [
             "candle",
             "meditation",
@@ -715,8 +713,8 @@
           "id": "coffee_shop_morning",
           "name": "Morning Coffee Shop",
           "subtitle": "for Focus & Productivity",
-          "video_queries": ["coffee shop morning", "cafe interior cozy", "coffee shop people working"],
-          "audio_file": "forest_birds.mp3",
+          "video_queries": ["coffee shop morning busy", "cafe interior people working", "coffee bar morning"],
+          "audio_file": "cafe_ambience.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=300,lowpass=f=4000,volume=2.5",
           "tags": ["coffee shop", "cafe", "study", "focus", "productivity", "lofi", "work"]
         },
@@ -724,7 +722,7 @@
           "id": "cafe_rain",
           "name": "Rainy Café Ambience",
           "subtitle": "for Deep Focus",
-          "video_queries": ["cafe rain window", "coffee shop rainy day", "cozy cafe rain"],
+          "video_queries": ["cafe rain window cozy", "coffee shop rainy day study", "cozy cafe rain night"],
           "audio_file": "rain.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=200,lowpass=f=5000,volume=3.0",
           "tags": ["cafe", "rain", "coffee shop", "focus", "study", "cozy", "ambience"]
@@ -733,24 +731,24 @@
           "id": "library_ambience",
           "name": "Library Ambience",
           "subtitle": "for Study & Focus",
-          "video_queries": ["library interior quiet", "library books study", "reading room library"],
-          "audio_lavfi": "anoisesrc=color=pink,highpass=f=500,lowpass=f=2500,volume=0.8",
+          "video_queries": ["library quiet study hall", "university library interior", "reading room silent books"],
+          "audio_lavfi": "anoisesrc=color=pink,highpass=f=400,lowpass=f=2800,volume=1.5",
           "tags": ["library", "study", "focus", "quiet", "reading", "concentration", "ambience"]
         },
         {
           "id": "keyboard_typing",
           "name": "Keyboard Typing ASMR",
           "subtitle": "for Focus & Productivity",
-          "video_queries": ["keyboard typing close up", "mechanical keyboard", "typing computer"],
-          "audio_lavfi": "anoisesrc=color=white,highpass=f=1500,lowpass=f=8000,volume=1.5",
+          "video_queries": ["mechanical keyboard closeup typing", "typing laptop desk", "keyboard asmr hands"],
+          "audio_lavfi": "anoisesrc=color=white,highpass=f=2500,lowpass=f=10000,volume=2.0",
           "tags": ["keyboard", "typing", "ASMR", "focus", "productivity", "study", "mechanical keyboard"]
         },
         {
           "id": "coffee_shop_evening",
           "name": "Evening Coffee Shop",
           "subtitle": "for Relaxation",
-          "video_queries": ["evening cafe warm lights", "coffee shop night", "cozy cafe evening"],
-          "audio_file": "rain.mp3",
+          "video_queries": ["evening cafe warm lights cozy", "coffee shop night people", "cozy cafe evening relaxing"],
+          "audio_file": "cafe_ambience.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=250,lowpass=f=3500,volume=2.2",
           "tags": ["coffee shop", "evening", "relax", "cafe", "cozy", "calm", "ambience"]
         },
@@ -758,8 +756,8 @@
           "id": "jazz_cafe",
           "name": "Jazz Café Ambience",
           "subtitle": "for Work & Relaxation",
-          "video_queries": ["jazz cafe bar", "cafe music live", "cozy bar ambience"],
-          "audio_file": "forest_rain.mp3",
+          "video_queries": ["jazz cafe bar lounge", "cafe bar ambience evening", "cozy jazz lounge interior"],
+          "audio_file": "cafe_ambience.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=350,lowpass=f=4500,volume=2.8",
           "tags": ["jazz", "cafe", "bar", "work", "relax", "lounge", "ambience"]
         }
