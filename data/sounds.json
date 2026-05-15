@@ -713,53 +713,125 @@
           "id": "coffee_shop_morning",
           "name": "Morning Coffee Shop",
           "subtitle": "for Focus & Productivity",
-          "video_queries": ["coffee shop morning busy", "cafe interior people working", "coffee bar morning"],
+          "video_queries": [
+            "coffee shop morning busy",
+            "cafe interior people working",
+            "coffee bar morning"
+          ],
           "audio_file": "cafe_ambience.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=300,lowpass=f=4000,volume=2.5",
-          "tags": ["coffee shop", "cafe", "study", "focus", "productivity", "lofi", "work"]
+          "tags": [
+            "coffee shop",
+            "cafe",
+            "study",
+            "focus",
+            "productivity",
+            "lofi",
+            "work"
+          ]
         },
         {
           "id": "cafe_rain",
           "name": "Rainy Café Ambience",
           "subtitle": "for Deep Focus",
-          "video_queries": ["cafe rain window cozy", "coffee shop rainy day study", "cozy cafe rain night"],
+          "video_queries": [
+            "cafe rain window cozy",
+            "coffee shop rainy day study",
+            "cozy cafe rain night"
+          ],
           "audio_file": "rain.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=200,lowpass=f=5000,volume=3.0",
-          "tags": ["cafe", "rain", "coffee shop", "focus", "study", "cozy", "ambience"]
+          "tags": [
+            "cafe",
+            "rain",
+            "coffee shop",
+            "focus",
+            "study",
+            "cozy",
+            "ambience"
+          ]
         },
         {
           "id": "library_ambience",
           "name": "Library Ambience",
           "subtitle": "for Study & Focus",
-          "video_queries": ["library quiet study hall", "university library interior", "reading room silent books"],
+          "video_queries": [
+            "library quiet study hall",
+            "university library interior",
+            "reading room silent books"
+          ],
           "audio_lavfi": "anoisesrc=color=pink,highpass=f=400,lowpass=f=2800,volume=1.5",
-          "tags": ["library", "study", "focus", "quiet", "reading", "concentration", "ambience"]
+          "tags": [
+            "library",
+            "study",
+            "focus",
+            "quiet",
+            "reading",
+            "concentration",
+            "ambience"
+          ]
         },
         {
           "id": "keyboard_typing",
           "name": "Keyboard Typing ASMR",
           "subtitle": "for Focus & Productivity",
-          "video_queries": ["mechanical keyboard closeup typing", "typing laptop desk", "keyboard asmr hands"],
-          "audio_lavfi": "anoisesrc=color=white,highpass=f=2500,lowpass=f=10000,volume=2.0",
-          "tags": ["keyboard", "typing", "ASMR", "focus", "productivity", "study", "mechanical keyboard"]
+          "video_queries": [
+            "mechanical keyboard closeup typing",
+            "typing laptop desk",
+            "keyboard asmr hands"
+          ],
+          "tags": [
+            "keyboard",
+            "typing",
+            "ASMR",
+            "focus",
+            "productivity",
+            "study",
+            "mechanical keyboard"
+          ],
+          "audio_file": "keyboard_typing.mp3"
         },
         {
           "id": "coffee_shop_evening",
           "name": "Evening Coffee Shop",
           "subtitle": "for Relaxation",
-          "video_queries": ["evening cafe warm lights cozy", "coffee shop night people", "cozy cafe evening relaxing"],
+          "video_queries": [
+            "evening cafe warm lights cozy",
+            "coffee shop night people",
+            "cozy cafe evening relaxing"
+          ],
           "audio_file": "cafe_ambience.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=250,lowpass=f=3500,volume=2.2",
-          "tags": ["coffee shop", "evening", "relax", "cafe", "cozy", "calm", "ambience"]
+          "tags": [
+            "coffee shop",
+            "evening",
+            "relax",
+            "cafe",
+            "cozy",
+            "calm",
+            "ambience"
+          ]
         },
         {
           "id": "jazz_cafe",
           "name": "Jazz Café Ambience",
           "subtitle": "for Work & Relaxation",
-          "video_queries": ["jazz cafe bar lounge", "cafe bar ambience evening", "cozy jazz lounge interior"],
+          "video_queries": [
+            "jazz cafe bar lounge",
+            "cafe bar ambience evening",
+            "cozy jazz lounge interior"
+          ],
           "audio_file": "cafe_ambience.mp3",
           "audio_lavfi": "anoisesrc=color=brown,highpass=f=350,lowpass=f=4500,volume=2.8",
-          "tags": ["jazz", "cafe", "bar", "work", "relax", "lounge", "ambience"]
+          "tags": [
+            "jazz",
+            "cafe",
+            "bar",
+            "work",
+            "relax",
+            "lounge",
+            "ambience"
+          ]
         }
       ]
     },
