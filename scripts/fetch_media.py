@@ -14,11 +14,14 @@ MIN_SIZE_KB = 300
 
 def download_video(query: str, output_path: Path, api_key: str,
                    min_size_kb: int = MIN_SIZE_KB,
-                   skip: int = 0) -> Path | None:
+                   skip: int = 0,
+                   require_keywords: list[str] | None = None) -> Path | None:
     """Search Pixabay for a short video clip and download it. Returns Path or None.
 
     skip: skip the first N valid hits — use slot_in_day (0,1,2) so each daily
           post picks a different clip even when queries are similar.
+    require_keywords: if set, the hit's `tags` must contain at least one of
+          these keywords (case-insensitive). Used to reject irrelevant results.
     """
     params = {
         "key": api_key,
@@ -38,6 +41,20 @@ def download_video(query: str, output_path: Path, api_key: str,
     if not hits:
         logger.warning(f"No video results for '{query}'")
         return None
+
+    # Filter by required keywords (relevance check)
+    if require_keywords:
+        kws = [k.lower() for k in require_keywords]
+        filtered = []
+        for h in hits:
+            tags = (h.get("tags", "") or "").lower()
+            if any(kw in tags for kw in kws):
+                filtered.append(h)
+        if filtered:
+            logger.info(f"Relevance filter: kept {len(filtered)}/{len(hits)} matching {require_keywords}")
+            hits = filtered
+        else:
+            logger.warning(f"Relevance filter: 0/{len(hits)} hits matched {require_keywords} — falling back to all")
 
     # Prefer clips close to 20s duration
     hits_sorted = sorted(hits, key=lambda h: abs(h.get("duration", 99) - 20))
@@ -82,21 +99,25 @@ def download_video(query: str, output_path: Path, api_key: str,
 
 
 def download_video_with_fallbacks(queries: list[str], output_path: Path,
-                                   api_key: str, skip: int = 0) -> Path | None:
+                                   api_key: str, skip: int = 0,
+                                   require_keywords: list[str] | None = None) -> Path | None:
     """Try each query in order until a video is found.
 
     skip: passed to download_video so each daily slot gets a different clip.
+    require_keywords: only accept hits whose tags contain at least one of these.
     """
     for i, q in enumerate(queries):
         label = "primary" if i == 0 else f"fallback #{i}"
         logger.info(f"Trying {label} query: '{q}' (skip={skip})")
-        path = download_video(q, output_path, api_key, skip=skip)
+        path = download_video(q, output_path, api_key, skip=skip,
+                              require_keywords=require_keywords)
         if path:
             return path
         # If skipping caused no results, retry without skip
         if skip > 0:
             logger.info(f"No result with skip={skip}, retrying '{q}' without skip")
-            path = download_video(q, output_path, api_key, skip=0)
+            path = download_video(q, output_path, api_key, skip=0,
+                                  require_keywords=require_keywords)
             if path:
                 return path
         time.sleep(0.3)

@@ -224,10 +224,16 @@ def main() -> int:
         # slot_in_day (0/1/2) is used as skip offset so each daily post
         # picks a different video/image even when queries are similar
         video_queries = variant.get("video_queries", [])
+        # Relevance keywords: variant tags filter out off-topic Pixabay results
+        # (e.g., "evening cafe warm lights" returning a generic alley clip)
+        require_keywords = variant.get("relevance_keywords") or [
+            t for t in variant.get("tags", []) if len(t) >= 4
+        ][:5] or None
         if video_queries:
             logger.info(f"Searching Pixabay videos for: {video_queries} (skip={slot_in_day})")
             media_path = download_video_with_fallbacks(
-                video_queries, video_path, config.PIXABAY_API_KEY, skip=slot_in_day
+                video_queries, video_path, config.PIXABAY_API_KEY,
+                skip=slot_in_day, require_keywords=require_keywords
             )
 
         if not media_path:
