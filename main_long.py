@@ -97,6 +97,12 @@ def main() -> int:
     logger.info("=" * 60)
     logger.info(f"Started at {start.isoformat()}")
 
+    # ── Manual pause: long videos are stopped indefinitely ──────────────────
+    # Bypass with BYPASS_LONG_PAUSE=1
+    if os.environ.get("BYPASS_LONG_PAUSE", "").strip() not in ("1", "true", "yes"):
+        logger.info("⏸️  Long videos are PAUSED. Set BYPASS_LONG_PAUSE=1 to resume.")
+        return 0
+
     if not config.PIXABAY_API_KEY:
         logger.error("PIXABAY_API_KEY not set in .env")
         return 1
