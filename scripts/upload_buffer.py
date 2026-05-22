@@ -23,6 +23,7 @@ BUFFER_GQL      = "https://api.buffer.com/graphql"
 CATBOX_URL      = "https://catbox.moe/user/api.php"
 LITTERBOX_URL   = "https://litterbox.catbox.moe/resources/internals/api.php"
 NULLPOINTER_URL = "https://0x0.st"
+TMPFILES_URL    = "https://tmpfiles.org/api/v1/upload"
 ORG_ID          = "69f49c408c5763cde0019a5b"
 
 _CAPTION_MAX  = 2200
@@ -87,7 +88,7 @@ def _upload_to_catbox(video_path: Path) -> str | None:
                 data={"reqtype": "fileupload", "userhash": ""},
                 files={"fileToUpload": (video_path.name, f, "video/mp4")},
                 headers={"User-Agent": "Mozilla/5.0"},
-                timeout=300,
+                timeout=(10, 120),  # fail-fast if catbox is down
             )
         if r.status_code == 200 and r.text.strip().startswith("https://"):
             url = r.text.strip()
@@ -152,8 +153,45 @@ def _upload_to_nullpointer(video_path: Path) -> str | None:
     return None
 
 
+def _upload_to_tmpfiles(video_path: Path) -> str | None:
+    """Upload to tmpfiles.org. Supports HEAD (Buffer requires this)."""
+    size_mb = video_path.stat().st_size / (1024 * 1024)
+    if size_mb > 100:
+        logger.warning(f"Video too large for tmpfiles.org ({size_mb:.0f} MB > 100 MB)")
+        return None
+    logger.info(f"Uploading to tmpfiles.org ({size_mb:.1f} MB)...")
+    try:
+        with open(video_path, "rb") as f:
+            r = requests.post(
+                TMPFILES_URL,
+                files={"file": (video_path.name, f, "video/mp4")},
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=(10, 300),
+            )
+        if r.status_code == 200:
+            j = r.json()
+            view_url = j.get("data", {}).get("url", "")
+            if view_url:
+                dl_url = view_url.replace("tmpfiles.org/", "tmpfiles.org/dl/", 1)
+                logger.info(f"tmpfiles URL: {dl_url}")
+                return dl_url
+        logger.warning(f"tmpfiles upload failed: {r.status_code} {r.text[:150]}")
+    except Exception as e:
+        logger.warning(f"tmpfiles upload error: {e}")
+    return None
+
+
 def _upload_video_public(video_path: Path) -> str | None:
-    """Try multiple free hosts until one works. Returns public URL or None."""
+    """Try multiple free hosts until one works. Returns public URL or None.
+
+    Order: tmpfiles (HEAD-friendly, Buffer-compatible) → catbox → litterbox → 0x0.
+    Buffer requires HEAD/GET access to validate content-length; litterbox/0x0
+    return 405 on HEAD which Buffer rejects.
+    """
+    url = _upload_to_tmpfiles(video_path)
+    if url:
+        return url
+    logger.info("Trying catbox.moe as fallback...")
     url = _upload_to_catbox(video_path)
     if url:
         return url
