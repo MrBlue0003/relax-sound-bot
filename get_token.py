@@ -48,8 +48,23 @@ print("Opening browser for YouTube authentication...")
 print("IMPORTANT: Select the account that has access to the 'Relax Sound' channel.")
 print()
 
+import webbrowser
+# Force Chrome instead of the system default browser
+chrome_paths = [
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe %s",
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s",
+]
+for path in chrome_paths:
+    try:
+        webbrowser.register("chrome", None, webbrowser.BackgroundBrowser(path.replace(" %s", "")))
+        webbrowser.get("chrome")
+        break
+    except Exception:
+        continue
+
 flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
-creds = flow.run_local_server(port=0, prompt="consent", access_type="offline")
+creds = flow.run_local_server(port=0, prompt="consent", access_type="offline",
+                               browser="chrome")
 
 print()
 print("=" * 60)

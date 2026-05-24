@@ -216,6 +216,11 @@ def _build_caption(variant: dict) -> str:
 
 def post_short_to_tiktok(video_path: Path, variant: dict) -> bool:
     """Post a short video to TikTok via Buffer. Returns True on success."""
+    # Kill-switch: set TIKTOK_DISABLED=1 to skip TikTok posting entirely
+    if os.environ.get("TIKTOK_DISABLED", "").strip() == "1":
+        logger.info("TIKTOK_DISABLED=1 — skipping TikTok post (account warmup mode)")
+        return False
+
     key = os.environ.get("BUFFER_API_KEY", "").strip()
     if not key:
         logger.info("BUFFER_API_KEY not set — TikTok post skipped")
