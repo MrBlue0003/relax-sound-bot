@@ -199,6 +199,11 @@ def main() -> int:
     pull_log(config.UPLOADED_FILE)
 
     try:
+        # FULL PAUSE: set BOT_PAUSED=1 on Railway to stop ALL posting (YouTube + TikTok).
+        if os.getenv("BOT_PAUSED", "").strip() in ("1", "true", "yes"):
+            logger.info("⏸️  BOT_PAUSED=1 — full pause active. Skipping run.")
+            return 0
+
         # Allow workflow_dispatch to force a specific variant
         force_id = os.getenv("FORCE_VARIANT_ID", "").strip()
         if force_id:
